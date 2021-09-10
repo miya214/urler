@@ -1,0 +1,7 @@
+build/
+public/
+**/node_modules/
+*.config.js
+.*lintrc.js
+/.eslintrc.js
+src/serviceWorker.ts
