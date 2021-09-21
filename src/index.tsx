@@ -2,8 +2,8 @@ import { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import './index.css';
-import App from './App';
-import { store } from './app/store';
+import App from './core/App';
+import { store } from './core/stores/app/store';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(

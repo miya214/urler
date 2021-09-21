@@ -37,13 +37,18 @@ module.exports = {
       { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
     ],
     'no-param-reassign': 0,
+    'no-nested-ternary': 'off',
     'react/react-in-jsx-scope': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/prop-types': 'off',
     'no-void': [
       'error',
       {
         allowAsStatement: true,
       },
     ],
+    '@typescript-eslint/camelcase': 'off',
+    camelcase: 'off',
   },
   settings: {
     'import/resolver': {
