@@ -120,7 +120,7 @@ export const fetchAsyncDeleteSelectPost = createAsyncThunk(
 
 const postInitialState: POST_STATE = {
   isLoadingPost: false,
-  isSetPost: false,
+  isNewPost: false,
   isExistPosts: true,
   openNewPost: false,
   openEditPost: false,
@@ -160,8 +160,11 @@ const postSlice = createSlice({
     fetchPostEnd(state) {
       state.isLoadingPost = false;
     },
-    resetIsSetPost(state) {
-      state.isSetPost = false;
+    setIsNewPost(state) {
+      state.isNewPost = true;
+    },
+    resetIsNewPost(state) {
+      state.isNewPost = false;
     },
     setIsExistPosts(state) {
       state.isExistPosts = true;
@@ -193,6 +196,7 @@ const postSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncGetPosts.fulfilled, (state, action) => {
+      state.isNewPost = false;
       if (state.posts.count === 0) {
         state.posts = action.payload;
       } else {
@@ -209,6 +213,7 @@ const postSlice = createSlice({
       }
     });
     builder.addCase(fetchAsyncCreatePost.fulfilled, (state, action) => {
+      state.isNewPost = true;
       state.posts.results.unshift(action.payload);
     });
     builder.addCase(fetchAsyncUpdatePost.fulfilled, (state, action) => {
@@ -227,7 +232,8 @@ const postSlice = createSlice({
 export const {
   fetchPostStart,
   fetchPostEnd,
-  resetIsSetPost,
+  setIsNewPost,
+  resetIsNewPost,
   resetPostsCount,
   setIsExistPosts,
   resetIsExistPosts,
@@ -243,8 +249,8 @@ export const selectIsLoadingPost = (state: RootState): boolean =>
   state.post.isLoadingPost;
 export const selectIsExistPosts = (state: RootState): boolean =>
   state.post.isExistPosts;
-export const selectIsSetPost = (state: RootState): boolean =>
-  state.post.isSetPost;
+export const selectIsNewPost = (state: RootState): boolean =>
+  state.post.isNewPost;
 export const selectPosts = (state: RootState): POSTS => state.post.posts;
 export const selectOpenDeletePost = (state: RootState): boolean =>
   state.post.openDeletePost;

@@ -13,6 +13,18 @@ import {
   fetchAsyncResetPasswordConfirm,
 } from '../../../../stores/slices/auth/authSlice';
 
+import {
+  AuthFormWrapper,
+  AuthFormHeading,
+  AuthFormInfo,
+  TxField,
+  ErrorMessage,
+  LoaderWrapper,
+} from '../../../atoms/Form/FormElements';
+
+import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
+import Loading from '../../../atoms/Loader';
+
 interface URLParams {
   uid: string;
   token: string;
@@ -61,15 +73,17 @@ const ResetPasswordCofirmPage: VFC = () => {
         touched,
         isValid,
       }) => (
-        <div>
+        <AuthFormWrapper>
           <form onSubmit={handleSubmit}>
             <div>
-              <h1>UMA</h1>
+              <AuthFormHeading>パスワードリセット</AuthFormHeading>
               <br />
-              <div>{isLoadingAuth && <CircularProgress />}</div>
+              <AuthFormInfo>新しいパスワードを入力してください。</AuthFormInfo>
               <br />
-
-              <TextField
+              <LoaderWrapper>{isLoadingAuth && <Loading />}</LoaderWrapper>
+              <TxField
+                id="standard-basic"
+                variant="standard"
                 placeholder="パスワード"
                 type="password"
                 name="new_password"
@@ -77,12 +91,12 @@ const ResetPasswordCofirmPage: VFC = () => {
                 onBlur={handleBlur}
                 value={values.new_password}
               />
-              <br />
               {touched.new_password && errors.new_password ? (
-                <div>{errors.new_password}</div>
+                <ErrorMessage>{errors.new_password}</ErrorMessage>
               ) : null}
-              <br />
-              <TextField
+              <TxField
+                id="standard-basic"
+                variant="standard"
                 placeholder="パスワード(確認用)"
                 type="password"
                 name="re_new_password"
@@ -90,26 +104,18 @@ const ResetPasswordCofirmPage: VFC = () => {
                 onBlur={handleBlur}
                 value={values.re_new_password}
               />
-              <br />
               {touched.re_new_password && errors.re_new_password ? (
-                <div>{errors.re_new_password}</div>
+                <ErrorMessage>{errors.re_new_password}</ErrorMessage>
               ) : null}
               <br />
-              <br />
-              <Button
-                variant="contained"
-                color="primary"
+              <AuthFormButton
+                isLoading={isLoadingAuth}
                 disabled={!isValid}
-                type="submit"
-              >
-                新規登録
-              </Button>
-              <br />
-              <br />
-              <Link to="/login">登録済みの方はこちら</Link>
+                ButtonText="更新"
+              />
             </div>
           </form>
-        </div>
+        </AuthFormWrapper>
       )}
     </Formik>
   );

@@ -100,17 +100,8 @@ const FolderDetail: VFC = () => {
           {!isLoadingFolder && <EditFolder />}
         </div>
       )}
-      <CommonDialog
-        msg="本当に削除しますか？"
-        isOpen={openDeleteFolder}
-        doYes={deleteFolder}
-        doNo={() => {
-          dispatch(resetOpenDeleteFolder());
-        }}
-      />
       {!isLoadingFolder && <EditFolder />}
       {!isLoadingFolder ? <div>{folder.name}</div> : <CircularProgress />}
-
       {myprofile.user === folder.user && (
         <div>
           <button
@@ -131,11 +122,9 @@ const FolderDetail: VFC = () => {
           </button>
         </div>
       )}
-
       {!isLoadingFolder && (
         <FavoriteButton id={folder.id} favorite={folder.favorite} />
       )}
-
       {!isLoadingFolder && <Posts />}
     </>
   );

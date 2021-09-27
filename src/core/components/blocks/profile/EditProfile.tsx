@@ -1,13 +1,13 @@
 import { VFC, useState } from 'react';
-import Modal from 'react-modal';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import Box from '@mui/material/Box';
+import { Button, TextField, IconButton, CircularProgress } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  Button,
-  TextField,
-  IconButton,
-  CircularProgress,
-} from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
 
 import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
@@ -23,17 +23,26 @@ import {
   editNickname,
 } from '../../../stores/slices/profile/profileSlice';
 
-const customeStyles = {
-  content: {
-    top: '55%',
-    left: '50%',
+import ModalWrapper from '../../atoms/Modal/ModalWrapper';
+import {
+  TxField,
+  ErrorMessage,
+  BottomActions,
+  CancelButton,
+} from '../../atoms/Form/FormElements';
 
-    width: 280,
-    height: 220,
-    padding: '50px',
+import SubmitButton from '../../atoms/Buttons/SubmitButton';
 
-    transform: 'translate(-50%,-50%)',
-  },
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
 };
 
 const EditProfile: VFC = () => {
@@ -42,64 +51,83 @@ const EditProfile: VFC = () => {
   const isLoadingProf = useSelector(selectIsLoadingProf);
   const openProfile = useSelector(selectOpenProfile);
   const profile = useSelector(selectMyProfile);
-  const [Nickname, setNickname] = useState<string>(profile.nickname);
-
-  const updateProfile = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    const packet = { id: profile.id, nickname: Nickname };
-    dispatch(fetchProfStart());
-    dispatch(editNickname(Nickname));
-    const result = await dispatch(fetchAsyncUpdateProf(packet));
-    if (fetchAsyncUpdateProf.rejected.match(result)) {
-      dispatch(resetIsAuth());
-      dispatch(resetOpenProfile());
-      history.push({
-        pathname: '/login',
-        state: {
-          from: '/mypage',
-        },
-      });
-      return;
-    }
-    dispatch(fetchProfEnd());
-    dispatch(resetOpenProfile());
-  };
 
   return (
-    <>
-      <Modal
+    <div>
+      <ModalWrapper
         isOpen={openProfile}
-        onRequestClose={() => {
-          dispatch(resetOpenProfile());
-        }}
-        style={customeStyles}
+        closeFunc={() => dispatch(resetOpenProfile())}
       >
-        <form>
-          <h1>SNS clone</h1>
-          <div>{isLoadingProf && <CircularProgress />}</div>
-          <br />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={Nickname}
-            onChange={(e) =>
-              // dispatch(editNickname(e.target.value))；
-              setNickname(e.target.value)
+        <Formik
+          initialErrors={{ nickname: 'required' }}
+          initialValues={{ id: profile.id, nickname: profile.nickname }}
+          onSubmit={async (values) => {
+            dispatch(fetchProfStart());
+            dispatch(editNickname(values.nickname));
+            const result = await dispatch(fetchAsyncUpdateProf(values));
+            if (fetchAsyncUpdateProf.rejected.match(result)) {
+              dispatch(resetIsAuth());
+              dispatch(resetOpenProfile());
+              history.push({
+                pathname: '/login',
+                state: {
+                  from: '/mypage',
+                },
+              });
+              return;
             }
-          />
-          <br />
-          <Button
-            disabled={!Nickname}
-            variant="contained"
-            color="primary"
-            type="submit"
-            onClick={updateProfile}
-          >
-            Update
-          </Button>
-        </form>
-      </Modal>
-    </>
+            dispatch(fetchProfEnd());
+            dispatch(resetOpenProfile());
+          }}
+          validationSchema={Yup.object().shape({
+            nickname: Yup.string()
+              .required('ニックネームを入力してください')
+              .max(20, '20文字以下で設定してください'),
+          })}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            handleBlur,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="nickname"
+                name="nickname"
+                type="input"
+                value={values.nickname}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.nickname && errors.nickname ? (
+                <ErrorMessage>{errors.nickname}</ErrorMessage>
+              ) : null}
+              <br />
+              <BottomActions>
+                <CancelButton
+                  onClick={() => {
+                    dispatch(resetOpenProfile());
+                  }}
+                >
+                  キャンセル
+                </CancelButton>
+                <SubmitButton
+                  isLoading={isLoadingProf}
+                  disabled={!isValid}
+                  ButtonText="更新"
+                />
+              </BottomActions>
+            </form>
+          )}
+        </Formik>
+      </ModalWrapper>
+    </div>
   );
 };
 

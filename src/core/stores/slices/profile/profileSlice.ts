@@ -117,6 +117,9 @@ const profileSlice = createSlice({
     editNickname(state, action: PayloadAction<string>) {
       state.myprofile.nickname = action.payload;
     },
+    resetProfile(state) {
+      state.myprofile = profileInitialState.myprofile;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncGetMyProf.fulfilled, (state, action) => {
@@ -143,6 +146,7 @@ export const {
   setOpenProfile,
   resetOpenProfile,
   editNickname,
+  resetProfile,
 } = profileSlice.actions;
 
 export const selectIsLoadingProf = (state: RootState): boolean =>

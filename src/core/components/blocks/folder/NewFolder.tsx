@@ -2,6 +2,8 @@ import { VFC, useState } from 'react';
 import Modal from 'react-modal';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import {
   Button,
   TextField,
@@ -16,89 +18,122 @@ import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
 import {
   selectIsLoadingFolder,
   selectOpenNewFolder,
-  selectOpenEditFolder,
   fetchFolderStart,
   fetchFolderEnd,
   fetchAsyncCreateFolder,
   resetOpenNewFolder,
 } from '../../../stores/slices/folder/folderSlice';
 
-const customeStyles = {
-  content: {
-    top: '55%',
-    left: '50%',
-
-    width: 280,
-    height: 220,
-    padding: '50px',
-
-    transform: 'translate(-50%,-50%)',
-  },
-};
+import ModalWrapper from '../../atoms/Modal/ModalWrapper';
+import {
+  TxField,
+  ErrorMessage,
+  BottomActions,
+  CancelButton,
+  SwitchWrapper,
+  SwitchSelectText,
+  SwitchSelect,
+  SwitchLabel,
+} from '../../atoms/Form/FormElements';
+import SubmitButton from '../../atoms/Buttons/SubmitButton';
 
 const NewFolder: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
   const history = useHistory();
   const isLoadingFolder = useSelector(selectIsLoadingFolder);
   const openNewFolder = useSelector(selectOpenNewFolder);
-  const [name, setName] = useState<string>('');
-  const [Public, setPublic] = useState<boolean>(false);
-
-  const handlePublicChange = () => {
-    setPublic(!Public);
-  };
-
-  const createFolder = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    const packet = { name, public: Public };
-    dispatch(fetchFolderStart());
-    const result = await dispatch(fetchAsyncCreateFolder(packet));
-    if (fetchAsyncCreateFolder.rejected.match(result)) {
-      dispatch(resetIsAuth());
-      dispatch(fetchFolderEnd());
-      dispatch(resetOpenNewFolder());
-      return;
-    }
-    dispatch(fetchFolderEnd());
-    dispatch(resetOpenNewFolder());
-  };
 
   return (
     <>
-      <Modal
+      <ModalWrapper
         isOpen={openNewFolder}
-        onRequestClose={() => {
+        closeFunc={() => {
           dispatch(resetOpenNewFolder());
         }}
-        style={customeStyles}
       >
-        <form>
-          <h1>SNS clone</h1>
-          <div>{isLoadingFolder && <CircularProgress />}</div>
-          <br />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Switch
-            checked={Public}
-            onChange={handlePublicChange}
-            inputProps={{ 'aria-label': 'controlled' }}
-          />
-          <br />
-          <Button
-            disabled={!name}
-            variant="contained"
-            color="primary"
-            type="submit"
-            onClick={createFolder}
-          >
-            作成
-          </Button>
-        </form>
-      </Modal>
+        <Formik
+          initialErrors={{ name: 'required' }}
+          initialValues={{
+            name: '',
+            public: false,
+          }}
+          onSubmit={async (values) => {
+            dispatch(fetchFolderStart());
+            const result = await dispatch(fetchAsyncCreateFolder(values));
+            if (fetchAsyncCreateFolder.rejected.match(result)) {
+              dispatch(resetIsAuth());
+              dispatch(resetOpenNewFolder());
+              return;
+            }
+            dispatch(fetchFolderEnd());
+            dispatch(resetOpenNewFolder());
+          }}
+          validationSchema={Yup.object().shape({
+            name: Yup.string()
+              .required('フォルダ名を入力してください')
+              .max(20, 'フォルダ名は20文字以下で設定してください'),
+          })}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            handleBlur,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="フォルダ名"
+                name="name"
+                type="input"
+                value={values.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.name && errors.name ? (
+                <ErrorMessage>{errors.name}</ErrorMessage>
+              ) : null}
+              <SwitchWrapper>
+                <SwitchLabel>公開設定</SwitchLabel>
+                <SwitchSelect>
+                  <SwitchSelectText className={!values.public ? 'active' : ''}>
+                    非公開
+                  </SwitchSelectText>
+                  <Switch
+                    color="default"
+                    checked={values.public}
+                    onChange={handleChange}
+                    name="public"
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                  <SwitchSelectText className={values.public ? 'active' : ''}>
+                    公開
+                  </SwitchSelectText>
+                </SwitchSelect>
+              </SwitchWrapper>
+              <br />
+              <BottomActions>
+                <CancelButton
+                  onClick={() => {
+                    dispatch(resetOpenNewFolder());
+                  }}
+                >
+                  キャンセル
+                </CancelButton>
+                <SubmitButton
+                  isLoading={isLoadingFolder}
+                  disabled={!isValid}
+                  ButtonText="作成"
+                />
+              </BottomActions>
+            </form>
+          )}
+        </Formik>
+      </ModalWrapper>
     </>
   );
 };

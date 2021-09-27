@@ -38,9 +38,7 @@ const App: VFC = () => {
 
   return (
     <div className="App">
-      <div className="main">
-        {!isLoadingProf ? <RouteComponent /> : <CircularProgress />}
-      </div>
+      {!isLoadingProf ? <RouteComponent /> : <CircularProgress />}
     </div>
   );
 };

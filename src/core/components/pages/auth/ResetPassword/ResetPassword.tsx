@@ -7,6 +7,20 @@ import { TextField, Button, CircularProgress } from '@material-ui/core';
 import { AppDispatch } from '../../../../stores/app/store';
 
 import {
+  AuthFormWrapper,
+  AuthFormHeading,
+  AuthFormInfo,
+  TxField,
+  ErrorMessage,
+  LoaderWrapper,
+  AuthFormBottomLink,
+  AuthFormBottomLinkWrapper,
+} from '../../../atoms/Form/FormElements';
+
+import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
+import Loading from '../../../atoms/Loader';
+
+import {
   fetchCredStart,
   fetchCredEnd,
   selectIsLoadingAuth,
@@ -45,14 +59,21 @@ const ResetPasswordPage: VFC = () => {
         touched,
         isValid,
       }) => (
-        <div>
+        <AuthFormWrapper>
           <form onSubmit={handleSubmit}>
             <div>
-              <h1>SNS clone</h1>
+              <AuthFormHeading>パスワードリセット</AuthFormHeading>
               <br />
-              <div>{isLoadingAuth && <CircularProgress />}</div>
+              <AuthFormInfo>
+                登録したメールアドレスを入力し、送信ボタンをクリックしてください。
+                <br />
+                パスワードのリセット手順をメールで送信します。
+              </AuthFormInfo>
               <br />
-              <TextField
+              <LoaderWrapper>{isLoadingAuth && <Loading />}</LoaderWrapper>
+              <TxField
+                id="standard-basic"
+                variant="standard"
                 placeholder="email"
                 type="input"
                 name="email"
@@ -60,24 +81,25 @@ const ResetPasswordPage: VFC = () => {
                 onBlur={handleBlur}
                 value={values.email}
               />
+              {touched.email && errors.email ? (
+                <ErrorMessage>{errors.email}</ErrorMessage>
+              ) : null}
               <br />
-              {touched.email && errors.email ? <div>{errors.email}</div> : null}
-              <br />
-              <Button
-                variant="contained"
-                color="primary"
+              <AuthFormButton
+                isLoading={isLoadingAuth}
                 disabled={!isValid}
-                type="submit"
-              >
-                送信
-              </Button>
+                ButtonText="送信"
+              />
               <br />
-              <br />
-              <Link to="/login">戻る</Link>
+              <AuthFormBottomLinkWrapper>
+                <AuthFormBottomLink to="/login">
+                  ログインページ
+                </AuthFormBottomLink>
+              </AuthFormBottomLinkWrapper>
               <br />
             </div>
           </form>
-        </div>
+        </AuthFormWrapper>
       )}
     </Formik>
   );

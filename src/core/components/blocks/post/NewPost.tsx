@@ -2,6 +2,8 @@ import { VFC, useState } from 'react';
 import Modal from 'react-modal';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import {
   Button,
   TextField,
@@ -33,87 +35,135 @@ import {
   resetOpenNewPost,
 } from '../../../stores/slices/post/postSlice';
 
-const customeStyles = {
-  content: {
-    top: '55%',
-    left: '50%',
-
-    width: 280,
-    height: 220,
-    padding: '50px',
-
-    transform: 'translate(-50%,-50%)',
-  },
-};
+import ModalWrapper from '../../atoms/Modal/ModalWrapper';
+import {
+  TxField,
+  ErrorMessage,
+  BottomActions,
+  CancelButton,
+  SwitchWrapper,
+  SwitchSelectText,
+  SwitchSelect,
+  SwitchLabel,
+} from '../../atoms/Form/FormElements';
+import SubmitButton from '../../atoms/Buttons/SubmitButton';
 
 const NewPost: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
   const folder = useSelector(selectFolder);
   const isLoadingPost = useSelector(selectIsLoadingPost);
   const openNewPost = useSelector(selectOpenNewPost);
-  const [url, setUrl] = useState<string>('');
-  const [name, setName] = useState<string>('');
-  const [text, setText] = useState<string>('');
-  const [Public, setPublic] = useState<boolean>(false);
-
-  const createPost = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    const packet = { folder: folder.id, url, name, text };
-    dispatch(fetchPostStart());
-    const result = await dispatch(fetchAsyncCreatePost(packet));
-    if (fetchAsyncCreatePost.rejected.match(result)) {
-      dispatch(resetIsAuth());
-      dispatch(fetchPostEnd());
-      dispatch(resetOpenNewPost());
-      return;
-    }
-    dispatch(fetchPostEnd());
-    dispatch(resetOpenNewPost());
-  };
 
   return (
     <>
-      <Modal
+      <ModalWrapper
         isOpen={openNewPost}
-        onRequestClose={() => {
+        closeFunc={() => {
           dispatch(resetOpenNewPost());
         }}
-        style={customeStyles}
       >
-        <form>
-          <h1>SNS clone</h1>
-          <div>{isLoadingPost && <CircularProgress />}</div>
-          <br />
-          <TextField
-            placeholder="url"
-            type="test"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <br />
-          <Button
-            disabled={!url}
-            variant="contained"
-            color="primary"
-            type="submit"
-            onClick={createPost}
-          >
-            作成
-          </Button>
-        </form>
-      </Modal>
+        <Formik
+          initialErrors={{ url: 'required', name: 'required' }}
+          initialValues={{
+            url: '',
+            name: '',
+            text: '',
+            folder: folder.id,
+          }}
+          onSubmit={async (values) => {
+            dispatch(fetchPostStart());
+            const result = await dispatch(fetchAsyncCreatePost(values));
+            if (fetchAsyncCreatePost.rejected.match(result)) {
+              dispatch(resetIsAuth());
+              dispatch(resetOpenNewPost());
+              return;
+            }
+            dispatch(fetchPostEnd());
+            dispatch(resetOpenNewPost());
+          }}
+          validationSchema={Yup.object().shape({
+            url: Yup.string()
+              .required('URLを入力してください')
+              .max(300, 'URLは300文字以内で設定してください'),
+            name: Yup.string()
+              .required('名前を入力してください')
+              .max(40, '名前は40文字以内で設定してください'),
+            text: Yup.string().max(
+              150,
+              '説明文は150文字以内で設定してください'
+            ),
+          })}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            handleBlur,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="URL"
+                name="url"
+                type="input"
+                value={values.url}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.url && errors.url ? (
+                <ErrorMessage>{errors.url}</ErrorMessage>
+              ) : null}
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="名前"
+                name="name"
+                type="input"
+                value={values.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.name && errors.name ? (
+                <ErrorMessage>{errors.name}</ErrorMessage>
+              ) : null}
+              <br />
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="説明"
+                name="text"
+                type="input"
+                value={values.text}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                multiline
+              />
+              {touched.text && errors.text ? (
+                <ErrorMessage>{errors.text}</ErrorMessage>
+              ) : null}
+              <br />
+              <BottomActions>
+                <CancelButton
+                  onClick={() => {
+                    dispatch(resetOpenNewPost());
+                  }}
+                >
+                  キャンセル
+                </CancelButton>
+                <SubmitButton
+                  isLoading={isLoadingPost}
+                  disabled={!isValid}
+                  ButtonText="作成"
+                />
+              </BottomActions>
+            </form>
+          )}
+        </Formik>
+      </ModalWrapper>
     </>
   );
 };

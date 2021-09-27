@@ -34,7 +34,7 @@ export interface POSTS {
 
 export interface POST_STATE {
   isLoadingPost: boolean;
-  isSetPost: boolean;
+  isNewPost: boolean;
   isExistPosts: boolean;
   openNewPost: boolean;
   openEditPost: boolean;

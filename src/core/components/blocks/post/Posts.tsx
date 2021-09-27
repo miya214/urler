@@ -8,10 +8,12 @@ import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
 
 import { selectFolder } from '../../../stores/slices/folder/folderSlice';
 
+import { selectMyProfile } from '../../../stores/slices/profile/profileSlice';
+
 import {
   selectPosts,
   selectIsLoadingPost,
-  selectIsSetPost,
+  selectIsNewPost,
   selectIsExistPosts,
   setOpenNewPost,
   fetchPostStart,
@@ -20,9 +22,10 @@ import {
   setIsExistPosts,
   resetPostsCount,
   setOpenEditPost,
+  resetIsNewPost,
 } from '../../../stores/slices/post/postSlice';
 
-import SearchBox from '../../atoms/SearchBox';
+import SearchBox from '../../atoms/Input/SearchBox';
 import OrderSelect from '../../atoms/OrderSelect';
 import PostOrderSelect from '../../atoms/PostOrderSelect';
 
@@ -32,8 +35,10 @@ import EditPost from './EditPost';
 const Posts: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
   const folder = useSelector(selectFolder);
+  const profile = useSelector(selectMyProfile);
   const posts = useSelector(selectPosts);
   const isExistPosts = useSelector(selectIsExistPosts);
+  const isNewPost = useSelector(selectIsNewPost);
   const isLoadingPost = useSelector(selectIsLoadingPost);
 
   const [searchText, setSearchText] = useState<string>('');
@@ -47,6 +52,7 @@ const Posts: VFC = () => {
   const [editPostText, setEditPostText] = useState<string>('');
 
   const loadMore = async (page: number) => {
+    dispatch(resetIsNewPost());
     if (!folder.id) {
       return;
     }
@@ -74,6 +80,7 @@ const Posts: VFC = () => {
   };
 
   const searchPost = async (e: FormEvent<HTMLFormElement>) => {
+    dispatch(resetIsNewPost());
     e.preventDefault();
     setHasMore(true);
     dispatch(setIsExistPosts());
@@ -96,8 +103,8 @@ const Posts: VFC = () => {
   const postsList = (
     <ul>
       {posts.results.map((post) => (
-        <div>
-          <li key={post.id}>
+        <div key={post.id}>
+          <li>
             <p>{post.name}</p>
             <p>{post.text}</p>
             <p>{post.url}</p>
@@ -137,14 +144,17 @@ const Posts: VFC = () => {
       </form>
 
       <NewPost />
-      <button
-        type="button"
-        onClick={() => {
-          dispatch(setOpenNewPost());
-        }}
-      >
-        作成
-      </button>
+      {folder.user === profile.user && (
+        <button
+          type="button"
+          onClick={() => {
+            dispatch(setOpenNewPost());
+          }}
+        >
+          作成
+        </button>
+      )}
+
       {editPostId && (
         <EditPost
           id={editPostId}
@@ -155,11 +165,14 @@ const Posts: VFC = () => {
         />
       )}
 
+      {/* ローディング中では無いかつ、ポストが存在するまたはポストが新しく作成された場合にポストリストが表示される */}
       {!isLoadingPost ? (
         isExistPosts ? (
           <InfiniteScroll loadMore={loadMore} hasMore={hasMore} loader={loader}>
             {postsList}
           </InfiniteScroll>
+        ) : isNewPost ? (
+          <div>{postsList}</div>
         ) : (
           <h1>有りません</h1>
         )

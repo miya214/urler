@@ -5,6 +5,18 @@ import * as Yup from 'yup';
 import { useHistory, useLocation, Link } from 'react-router-dom';
 import { TextField, Button, CircularProgress } from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
+import {
+  AuthFormWrapper,
+  AuthFormHeading,
+  TxField,
+  ErrorMessage,
+  LoaderWrapper,
+  AuthFormBottomLink,
+  AuthFormBottomLinkWrapper,
+} from '../../atoms/Form/FormElements';
+
+import AuthFormButton from '../../atoms/Buttons/AuthFormButton';
+import Loading from '../../atoms/Loader';
 
 import {
   fetchCredStart,
@@ -12,6 +24,12 @@ import {
   selectIsLoadingAuth,
   fetchAsyncLogin,
 } from '../../../stores/slices/auth/authSlice';
+import {
+  fetchAsyncGetMyProf,
+  fetchProfStart,
+  fetchProfEnd,
+  selectMyProfile,
+} from '../../../stores/slices/profile/profileSlice';
 
 export interface LOCATION_FROM_PROPS {
   from: string;
@@ -51,53 +69,58 @@ const LoginPage: VFC = () => {
         touched,
         isValid,
       }) => (
-        <div>
+        <AuthFormWrapper>
           <form onSubmit={handleSubmit}>
             <div>
-              <h1>SNS clone</h1>
+              <AuthFormHeading>ログイン</AuthFormHeading>
               <br />
-              <div>{isLoadingAuth && <CircularProgress />}</div>
-              <br />
-              <TextField
-                placeholder="email"
+              <LoaderWrapper>{isLoadingAuth && <Loading />}</LoaderWrapper>
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                placeholder="メールアドレス"
                 type="input"
                 name="email"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.email}
               />
-              <br />
-              {touched.email && errors.email ? <div>{errors.email}</div> : null}
-              <TextField
-                placeholder="password"
+              {touched.email && errors.email ? (
+                <ErrorMessage>{errors.email}</ErrorMessage>
+              ) : null}
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                placeholder="パスワード"
                 type="password"
                 name="password"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.password}
               />
-              <br />
               {touched.password && errors.password ? (
-                <div>{errors.password}</div>
+                <ErrorMessage>{errors.password}</ErrorMessage>
               ) : null}
               <br />
-              <br />
-              <Button
-                variant="contained"
-                color="primary"
+
+              <AuthFormButton
+                isLoading={isLoadingAuth}
                 disabled={!isValid}
-                type="submit"
-              >
-                Login
-              </Button>
+                ButtonText="ログイン"
+              />
               <br />
-              <br />
-              <Link to="/signup">新規登録はこちら</Link>
-              <br />
-              <Link to="/password/reset">パスワードを忘れた方はこちら</Link>
+              <AuthFormBottomLinkWrapper>
+                <AuthFormBottomLink to="/password/reset">
+                  パスワードを忘れた場合
+                </AuthFormBottomLink>
+                <br />
+                <AuthFormBottomLink to="/signup">
+                  新規登録はこちら
+                </AuthFormBottomLink>
+              </AuthFormBottomLinkWrapper>
             </div>
           </form>
-        </div>
+        </AuthFormWrapper>
       )}
     </Formik>
   );

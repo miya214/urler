@@ -245,7 +245,7 @@ interface PROPS_SET_FOLDER {
   name: string;
   public: boolean;
   posts_add: string;
-  favorite: [];
+  favorite: string[];
 }
 
 const folderSlice = createSlice({
@@ -420,6 +420,7 @@ export const {
   resetIsSetFolder,
   resetFoldersCount,
   resetMyFoldersCount,
+  resetFavoriteFoldersCount,
   setIsExistFolders,
   resetIsExistFolders,
   setIsExistFavoriteFolders,
@@ -451,6 +452,9 @@ export const selectMyFolders = (state: RootState): FOLDERS =>
   state.folder.myfolders;
 export const selectFolders = (state: RootState): FOLDERS =>
   state.folder.folders;
+export const selectFavoriteFolders = (
+  state: RootState
+): FOLDERS_WITHOUT_FAVORITE => state.folder.favoritefolders;
 export const selectOpenDeleteFolder = (state: RootState): boolean =>
   state.folder.openDeleteFolder;
 export const selectOpenNewFolder = (state: RootState): boolean =>

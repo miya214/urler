@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 import { CircularProgress } from '@material-ui/core';
+import Divider from '@mui/material/Divider';
 import { AppDispatch } from '../../../stores/app/store';
 import NewFolder from '../../blocks/folder/NewFolder';
 import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
@@ -22,14 +23,31 @@ import {
   setHasMyFolder,
   resetMyFoldersCount,
 } from '../../../stores/slices/folder/folderSlice';
-
-import SearchBox from '../../atoms/SearchBox';
-import PublicSelect from '../../atoms/PublicSelect';
-import OrderSelect from '../../atoms/OrderSelect';
 import {
   resetPostsCount,
   setIsExistPosts,
 } from '../../../stores/slices/post/postSlice';
+
+import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
+
+import SearchBox from '../../atoms/Input/SearchBox';
+import PublicSelect from '../../atoms/Input/PublicSelect';
+import OrderSelect from '../../atoms/OrderSelect';
+import {
+  MainBody,
+  FolderSection,
+  SearchSection,
+  SearchContent,
+  SearchFieldWrapper,
+  NotFoundText,
+  LoadingWrapper,
+} from '../../blocks/main/MainElements';
+import FolderList from '../../blocks/folder/FolderList';
+import FolderListItem from '../../blocks/folder/FolderListItem';
+import { FolderItemLink } from '../../blocks/folder/FolderElements';
+import SearchButton from '../../atoms/Buttons/SearchButton';
+import Loading from '../../atoms/Loader';
+import MainHeader from '../../blocks/main/MainHeader';
 
 const TopPage: VFC = () => {
   const hasMyFolder = useSelector(selectHasMyFolder);
@@ -43,6 +61,10 @@ const TopPage: VFC = () => {
   const isLoadingFolder = useSelector(selectIsLoadingFolder);
 
   const [hasMore, setHasMore] = useState<boolean>(true);
+
+  useEffect(() => {
+    dispatch(setActiveIndex(0));
+  }, [dispatch]);
 
   const loadMore = async (page: number) => {
     const nextUrl = myfolders.next;
@@ -70,7 +92,7 @@ const TopPage: VFC = () => {
     dispatch(setHasMyFolder());
     dispatch(fetchFolderStart());
     dispatch(resetMyFoldersCount());
-    await dispatch(
+    const result = await dispatch(
       fetchAsyncGetMyFolders({
         url: '',
         search: searchText,
@@ -78,82 +100,99 @@ const TopPage: VFC = () => {
         public: Public,
       })
     );
+    if (fetchAsyncGetMyFolders.rejected.match(result)) {
+      dispatch(resetIsAuth());
+    }
     dispatch(fetchFolderEnd());
   };
 
   const foldersList = (
-    <ul>
+    <FolderList>
       {myfolders.results.map((folder) => (
-        <li key={folder.id}>
-          <Link
-            to={`/folder/${folder.id}`}
-            onClick={() => {
-              dispatch(resetPostsCount());
-              dispatch(
-                setFolder({
-                  id: folder.id,
-                  user: folder.user,
-                  name: folder.name,
-                  public: folder.public,
-                  posts_add: folder.posts_add,
-                  favorite: folder.favorite,
-                })
-              );
+        <FolderItemLink
+          key={folder.id}
+          to={`/folder/${folder.id}`}
+          onClick={() => {
+            dispatch(resetPostsCount());
+            dispatch(
+              setFolder({
+                id: folder.id,
+                user: folder.user,
+                name: folder.name,
+                public: folder.public,
+                posts_add: folder.posts_add,
+                favorite: folder.favorite,
+              })
+            );
 
-              dispatch(setIsExistPosts());
-            }}
-          >
-            {folder.name}
-          </Link>
-          <p>{folder.posts_add}</p>
-          <p>{folder.id}</p>
-        </li>
+            dispatch(setIsExistPosts());
+          }}
+        >
+          <FolderListItem folder={folder} />
+          <Divider />
+        </FolderItemLink>
       ))}
-    </ul>
+    </FolderList>
   );
 
   const loader = (
-    <div className="loader" key={0}>
-      <CircularProgress />
-    </div>
+    <LoadingWrapper className="loader" key={0}>
+      <Loading />
+    </LoadingWrapper>
   );
 
   return (
     <>
       <NewFolder />
-      <button
-        type="button"
-        onClick={() => {
+      <MainHeader
+        title="トップ"
+        isHistory={false}
+        path=""
+        buttonText="作成"
+        clickOpenModalFunc={() => {
           dispatch(setOpenNewFolder());
         }}
-      >
-        作成
-      </button>
-      <form onSubmit={(e) => searchFolder(e)}>
-        <SearchBox changeEvent={(e) => setSearchText(e.target.value)} />
-        <PublicSelect
-          checkedNot={() => setPublic('')}
-          checkedPublic={() => setPublic('true')}
-          checkedPrivate={() => setPublic('false')}
-        />
-        <OrderSelect
-          selectValue={orderingText}
-          changeEvent={(e) => setOrderingText(e.target.value)}
-        />
-        <button type="submit">検索</button>
-      </form>
-      <Link to="/mypage">マイページ</Link>
-      {!isLoadingFolder ? (
-        hasMyFolder ? (
-          <InfiniteScroll loadMore={loadMore} hasMore={hasMore} loader={loader}>
-            {foldersList}
-          </InfiniteScroll>
-        ) : (
-          <h1>有りません</h1>
-        )
-      ) : (
-        <CircularProgress />
-      )}
+      />
+      <MainBody>
+        <SearchSection>
+          <SearchContent>
+            <SearchFieldWrapper>
+              <form onSubmit={(e) => searchFolder(e)}>
+                <SearchBox changeEvent={(e) => setSearchText(e.target.value)} />
+                <PublicSelect
+                  checkedNot={() => setPublic('')}
+                  checkedPublic={() => setPublic('true')}
+                  checkedPrivate={() => setPublic('false')}
+                />
+                <OrderSelect
+                  selectValue={orderingText}
+                  changeEvent={(e) => setOrderingText(e.target.value)}
+                />
+                <SearchButton ButtonText="検索" />
+              </form>
+            </SearchFieldWrapper>
+          </SearchContent>
+        </SearchSection>
+        <FolderSection>
+          {!isLoadingFolder ? (
+            hasMyFolder ? (
+              <InfiniteScroll
+                loadMore={loadMore}
+                hasMore={hasMore}
+                loader={loader}
+              >
+                {foldersList}
+              </InfiniteScroll>
+            ) : (
+              <NotFoundText>フォルダが見つかりませんでした。</NotFoundText>
+            )
+          ) : (
+            <LoadingWrapper>
+              <Loading />
+            </LoadingWrapper>
+          )}
+        </FolderSection>
+      </MainBody>
     </>
   );
 };

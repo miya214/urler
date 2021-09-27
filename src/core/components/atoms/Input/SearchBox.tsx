@@ -3,15 +3,17 @@ import { TextField } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Input from '@material-ui/core/Input';
 import SearchIcon from '@material-ui/icons/Search';
+import { SearchField } from './InputElements';
 
 const SearchBox: VFC<{
   changeEvent: (e: ChangeEvent<HTMLInputElement>) => void;
 }> = ({ changeEvent }) => (
-  <TextField
-    id="filled-search"
-    label="検索"
+  <SearchField
+    id="outlined-search"
+    variant="outlined"
+    label="検索ワード"
     type="search"
-    variant="filled"
+    color="primary"
     onChange={changeEvent}
   />
 );

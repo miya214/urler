@@ -4,12 +4,14 @@ import profileReducer from '../slices/profile/profileSlice';
 import folderReducer from '../slices/folder/folderSlice';
 import postReducer from '../slices/post/postSlice';
 import messageReducer from '../slices/message/messageSlice';
+import barReducer from '../slices/bar/barSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     profile: profileReducer,
     message: messageReducer,
+    bar: barReducer,
     folder: folderReducer,
     post: postReducer,
   },

@@ -2,6 +2,8 @@ import { VFC, useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import {
   Button,
   TextField,
@@ -31,18 +33,18 @@ import {
   selectOpenEditPost,
 } from '../../../stores/slices/post/postSlice';
 
-const customeStyles = {
-  content: {
-    top: '55%',
-    left: '50%',
-
-    width: 280,
-    height: 220,
-    padding: '50px',
-
-    transform: 'translate(-50%,-50%)',
-  },
-};
+import ModalWrapper from '../../atoms/Modal/ModalWrapper';
+import {
+  TxField,
+  ErrorMessage,
+  BottomActions,
+  CancelButton,
+  SwitchWrapper,
+  SwitchSelectText,
+  SwitchSelect,
+  SwitchLabel,
+} from '../../atoms/Form/FormElements';
+import SubmitButton from '../../atoms/Buttons/SubmitButton';
 
 const EditPost: VFC<{
   id: string;
@@ -54,73 +56,118 @@ const EditPost: VFC<{
   const dispatch: AppDispatch = useDispatch();
   const isLoadingPost = useSelector(selectIsLoadingPost);
   const openEditPost = useSelector(selectOpenEditPost);
-  const [Url, setUrl] = useState<string>(url);
-  const [Name, setName] = useState<string>(name);
-  const [Text, setText] = useState<string>(text);
-
-  useEffect(() => {
-    setUrl(url);
-    setName(name);
-    setText(text);
-  }, [name, text, url]);
-
-  const updatePost = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    const packet = { id, url: Url, name: Name, text: Text, folder };
-    dispatch(fetchPostStart());
-    const result = await dispatch(fetchAsyncUpdatePost(packet));
-    if (fetchAsyncUpdateFolder.rejected.match(result)) {
-      dispatch(resetIsAuth());
-      dispatch(resetOpenEditPost());
-      return;
-    }
-    dispatch(fetchPostEnd());
-    dispatch(resetOpenEditPost());
-  };
 
   return (
     <>
-      <Modal
+      <ModalWrapper
         isOpen={openEditPost}
-        onRequestClose={() => {
+        closeFunc={() => {
           dispatch(resetOpenEditPost());
         }}
-        style={customeStyles}
       >
-        <form>
-          <h1>SNS clone</h1>
-          <div>{isLoadingPost && <CircularProgress />}</div>
-          <br />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={Url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={Name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <TextField
-            placeholder="nickname"
-            type="test"
-            value={Text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <br />
-          <Button
-            disabled={!Url}
-            variant="contained"
-            color="primary"
-            type="submit"
-            onClick={updatePost}
-          >
-            作成
-          </Button>
-        </form>
-      </Modal>
+        <Formik
+          initialErrors={{ url: 'required', name: 'required' }}
+          initialValues={{
+            id,
+            url,
+            name,
+            text,
+            folder,
+          }}
+          onSubmit={async (values) => {
+            dispatch(fetchPostStart());
+            const result = await dispatch(fetchAsyncUpdatePost(values));
+            if (fetchAsyncUpdatePost.rejected.match(result)) {
+              dispatch(resetIsAuth());
+              dispatch(resetOpenEditPost());
+              return;
+            }
+            dispatch(fetchPostEnd());
+            dispatch(resetOpenEditPost());
+          }}
+          validationSchema={Yup.object().shape({
+            url: Yup.string()
+              .required('URLを入力してください')
+              .max(300, 'URLは300文字以内で設定してください'),
+            name: Yup.string()
+              .required('名前を入力してください')
+              .max(40, '名前は40文字以内で設定してください'),
+            text: Yup.string().max(
+              150,
+              '説明文は150文字以内で設定してください'
+            ),
+          })}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            handleBlur,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="URL"
+                name="url"
+                type="input"
+                value={values.url}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.url && errors.url ? (
+                <ErrorMessage>{errors.url}</ErrorMessage>
+              ) : null}
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="名前"
+                name="name"
+                type="input"
+                value={values.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {touched.name && errors.name ? (
+                <ErrorMessage>{errors.name}</ErrorMessage>
+              ) : null}
+              <br />
+              <TxField
+                id="standard-basic"
+                variant="standard"
+                label="説明"
+                name="text"
+                type="input"
+                value={values.text}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                multiline
+              />
+              {touched.text && errors.text ? (
+                <ErrorMessage>{errors.text}</ErrorMessage>
+              ) : null}
+              <br />
+              <BottomActions>
+                <CancelButton
+                  onClick={() => {
+                    dispatch(resetOpenEditPost());
+                  }}
+                >
+                  キャンセル
+                </CancelButton>
+                <SubmitButton
+                  isLoading={isLoadingPost}
+                  disabled={!isValid}
+                  ButtonText="作成"
+                />
+              </BottomActions>
+            </form>
+          )}
+        </Formik>
+      </ModalWrapper>
     </>
   );
 };

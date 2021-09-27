@@ -15,7 +15,7 @@ import {
 
 const FavoriteButton: VFC<{
   id: string;
-  favorite: [];
+  favorite: string[];
 }> = ({ id, favorite }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch: AppDispatch = useDispatch();

@@ -19,7 +19,7 @@ export interface FOLDER {
   name: string;
   public: boolean;
   posts_add: string;
-  favorite: [];
+  favorite: string[];
 }
 
 export interface FOLDERS {

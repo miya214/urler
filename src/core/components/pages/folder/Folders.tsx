@@ -2,6 +2,7 @@ import { VFC, useEffect, useCallback, useState, FormEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
+import Divider from '@mui/material/Divider';
 import { CircularProgress } from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
 import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
@@ -23,12 +24,31 @@ import {
   resetFoldersCount,
 } from '../../../stores/slices/folder/folderSlice';
 
-import SearchBox from '../../atoms/SearchBox';
-import OrderSelect from '../../atoms/OrderSelect';
 import {
   resetPostsCount,
   setIsExistPosts,
 } from '../../../stores/slices/post/postSlice';
+
+import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
+
+import SearchBox from '../../atoms/Input/SearchBox';
+import OrderSelect from '../../atoms/OrderSelect';
+
+import {
+  MainBody,
+  FolderSection,
+  SearchSection,
+  SearchContent,
+  SearchFieldWrapper,
+  NotFoundText,
+  LoadingWrapper,
+} from '../../blocks/main/MainElements';
+import FolderList from '../../blocks/folder/FolderList';
+import FolderListItem from '../../blocks/folder/FolderListItem';
+import { FolderItemLink } from '../../blocks/folder/FolderElements';
+import SearchButton from '../../atoms/Buttons/SearchButton';
+import Loading from '../../atoms/Loader';
+import MainHeader from '../../blocks/main/MainHeader';
 
 const FoldersPage: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -40,6 +60,10 @@ const FoldersPage: VFC = () => {
   const [orderingText, setOrderingText] = useState<string>('');
 
   const [hasMore, setHasMore] = useState<boolean>(true);
+
+  useEffect(() => {
+    dispatch(setActiveIndex(2));
+  }, [dispatch]);
 
   const loadMore = async (page: number) => {
     const nextUrl = folders.next;
@@ -80,63 +104,75 @@ const FoldersPage: VFC = () => {
   };
 
   const foldersList = (
-    <ul>
+    <FolderList>
       {folders.results.map((folder) => (
-        <li key={folder.id}>
-          <Link
-            to={`/folder/${folder.id}`}
-            onClick={() => {
-              dispatch(resetPostsCount());
-              dispatch(
-                setFolder({
-                  id: folder.id,
-                  user: folder.user,
-                  name: folder.name,
-                  public: folder.public,
-                  posts_add: folder.posts_add,
-                  favorite: folder.favorite,
-                })
-              );
-              dispatch(setIsExistPosts());
-            }}
-          >
-            {folder.name}
-          </Link>
-          <p>{folder.posts_add}</p>
-          <p>{folder.id}</p>
-        </li>
+        <FolderItemLink
+          to={`/folder/${folder.id}`}
+          onClick={() => {
+            dispatch(resetPostsCount());
+            dispatch(
+              setFolder({
+                id: folder.id,
+                user: folder.user,
+                name: folder.name,
+                public: folder.public,
+                posts_add: folder.posts_add,
+                favorite: folder.favorite,
+              })
+            );
+            dispatch(setIsExistPosts());
+          }}
+        >
+          <FolderListItem folder={folder} />
+          <Divider />
+        </FolderItemLink>
       ))}
-    </ul>
+    </FolderList>
   );
 
   const loader = (
-    <div className="loader" key={0}>
-      <CircularProgress />
-    </div>
+    <LoadingWrapper className="loader" key={0}>
+      <Loading />
+    </LoadingWrapper>
   );
 
   return (
     <>
-      <form onSubmit={(e) => searchFolder(e)}>
-        <SearchBox changeEvent={(e) => setSearchText(e.target.value)} />
-        <OrderSelect
-          selectValue={orderingText}
-          changeEvent={(e) => setOrderingText(e.target.value)}
-        />
-        <button type="submit">検索</button>
-      </form>
-
-      {!isLoadingFolder ? (
-        isExistFolders ? (
-          <InfiniteScroll loadMore={loadMore} hasMore={hasMore} loader={loader}>
-            {foldersList}
-          </InfiniteScroll>
-        ) : (
-          <h1>有りません</h1>
-        )
-      ) : (
-        <CircularProgress />
-      )}
+      <MainBody>
+        <SearchSection>
+          <SearchContent>
+            <SearchFieldWrapper>
+              <form onSubmit={(e) => searchFolder(e)}>
+                <SearchBox changeEvent={(e) => setSearchText(e.target.value)} />
+                <OrderSelect
+                  selectValue={orderingText}
+                  changeEvent={(e) => setOrderingText(e.target.value)}
+                />
+                <SearchButton ButtonText="検索" />
+              </form>
+            </SearchFieldWrapper>
+          </SearchContent>
+        </SearchSection>
+        <FolderSection>
+          {!isLoadingFolder ? (
+            isExistFolders ? (
+              <InfiniteScroll
+                loadMore={loadMore}
+                hasMore={hasMore}
+                loader={loader}
+              >
+                {foldersList}
+              </InfiniteScroll>
+            ) : (
+              <NotFoundText>フォルダが見つかりませんでした。</NotFoundText>
+            )
+          ) : (
+            <LoadingWrapper>
+              <Loading />
+            </LoadingWrapper>
+          )}
+        </FolderSection>
+      </MainBody>
     </>
   );
 };

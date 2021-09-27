@@ -7,6 +7,19 @@ import { TextField, Button, CircularProgress } from '@material-ui/core';
 import { AppDispatch } from '../../../../stores/app/store';
 
 import {
+  AuthFormWrapper,
+  AuthFormHeading,
+  TxField,
+  ErrorMessage,
+  LoaderWrapper,
+  AuthFormBottomLink,
+  AuthFormBottomLinkWrapper,
+} from '../../../atoms/Form/FormElements';
+
+import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
+import Loading from '../../../atoms/Loader';
+
+import {
   fetchCredStart,
   fetchCredEnd,
   selectIsLoadingAuth,
@@ -52,14 +65,15 @@ const SignUpPage: VFC = () => {
         touched,
         isValid,
       }) => (
-        <div>
+        <AuthFormWrapper>
           <form onSubmit={handleSubmit}>
             <div>
-              <h1>UMA</h1>
+              <AuthFormHeading>新規登録</AuthFormHeading>
               <br />
-              <div>{isLoadingAuth && <CircularProgress />}</div>
-              <br />
-              <TextField
+              <LoaderWrapper>{isLoadingAuth && <Loading />}</LoaderWrapper>
+              <TxField
+                id="standard-basic"
+                variant="standard"
                 placeholder="メールアドレス"
                 type="input"
                 name="email"
@@ -67,10 +81,12 @@ const SignUpPage: VFC = () => {
                 onBlur={handleBlur}
                 value={values.email}
               />
-              <br />
-              {touched.email && errors.email ? <div>{errors.email}</div> : null}
-              <br />
-              <TextField
+              {touched.email && errors.email ? (
+                <ErrorMessage>{errors.email}</ErrorMessage>
+              ) : null}
+              <TxField
+                id="standard-basic"
+                variant="standard"
                 placeholder="パスワード"
                 type="password"
                 name="password"
@@ -78,12 +94,12 @@ const SignUpPage: VFC = () => {
                 onBlur={handleBlur}
                 value={values.password}
               />
-              <br />
               {touched.password && errors.password ? (
-                <div>{errors.password}</div>
+                <ErrorMessage>{errors.password}</ErrorMessage>
               ) : null}
-              <br />
-              <TextField
+              <TxField
+                id="standard-basic"
+                variant="standard"
                 placeholder="パスワード(確認用)"
                 type="password"
                 name="re_password"
@@ -91,26 +107,25 @@ const SignUpPage: VFC = () => {
                 onBlur={handleBlur}
                 value={values.re_password}
               />
-              <br />
               {touched.re_password && errors.re_password ? (
-                <div>{errors.re_password}</div>
+                <ErrorMessage>{errors.re_password}</ErrorMessage>
               ) : null}
               <br />
-              <br />
-              <Button
-                variant="contained"
-                color="primary"
+
+              <AuthFormButton
+                isLoading={isLoadingAuth}
                 disabled={!isValid}
-                type="submit"
-              >
-                新規登録
-              </Button>
+                ButtonText="新規登録"
+              />
               <br />
-              <br />
-              <Link to="/login">登録済みの方はこちら</Link>
+              <AuthFormBottomLinkWrapper>
+                <AuthFormBottomLink to="/login">
+                  登録済みの方はこちら
+                </AuthFormBottomLink>
+              </AuthFormBottomLinkWrapper>
             </div>
           </form>
-        </div>
+        </AuthFormWrapper>
       )}
     </Formik>
   );
