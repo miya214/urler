@@ -5,7 +5,10 @@ import InfiniteScroll from 'react-infinite-scroller';
 import Divider from '@mui/material/Divider';
 import { CircularProgress } from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
-import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
+import {
+  resetIsAuth,
+  setAuthErrorMessage,
+} from '../../../stores/slices/auth/authSlice';
 
 import {
   selectMyFolders,
@@ -24,10 +27,7 @@ import {
   resetFoldersCount,
 } from '../../../stores/slices/folder/folderSlice';
 
-import {
-  resetPostsCount,
-  setIsExistPosts,
-} from '../../../stores/slices/post/postSlice';
+import { resetPosts } from '../../../stores/slices/post/postSlice';
 
 import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
 
@@ -49,6 +49,9 @@ import { FolderItemLink } from '../../blocks/folder/FolderElements';
 import SearchButton from '../../atoms/Buttons/SearchButton';
 import Loading from '../../atoms/Loader';
 import MainHeader from '../../blocks/main/MainHeader';
+import { OpenModalBtn } from '../../atoms/Buttons/ButtonDesign';
+
+import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
 
 const FoldersPage: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -80,12 +83,18 @@ const FoldersPage: VFC = () => {
       })
     );
     if (fetchAsyncGetFolders.rejected.match(result)) {
+      dispatch(
+        setAuthErrorMessage(
+          'アクセストークンの有効期限が切れました。再ログインしてください'
+        )
+      );
       dispatch(resetIsAuth());
     }
   };
 
   const searchFolder = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    window.scrollTo({ top: 0 });
     setHasMore(true);
     dispatch(setIsExistFolders());
     dispatch(fetchFolderStart());
@@ -98,6 +107,11 @@ const FoldersPage: VFC = () => {
       })
     );
     if (fetchAsyncGetFolders.rejected.match(result)) {
+      dispatch(
+        setAuthErrorMessage(
+          'アクセストークンの有効期限が切れました。再ログインしてください'
+        )
+      );
       dispatch(resetIsAuth());
     }
     dispatch(fetchFolderEnd());
@@ -107,9 +121,9 @@ const FoldersPage: VFC = () => {
     <FolderList>
       {folders.results.map((folder) => (
         <FolderItemLink
+          key={folder.id}
           to={`/folder/${folder.id}`}
           onClick={() => {
-            dispatch(resetPostsCount());
             dispatch(
               setFolder({
                 id: folder.id,
@@ -120,7 +134,7 @@ const FoldersPage: VFC = () => {
                 favorite: folder.favorite,
               })
             );
-            dispatch(setIsExistPosts());
+            dispatch(resetPosts());
           }}
         >
           <FolderListItem folder={folder} />
@@ -138,6 +152,11 @@ const FoldersPage: VFC = () => {
 
   return (
     <>
+      <MainHeader
+        title="Global"
+        isHistory={false}
+        buttonElem={<TopLinkButton />}
+      />
       <MainBody>
         <SearchSection>
           <SearchContent>

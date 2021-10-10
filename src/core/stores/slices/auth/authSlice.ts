@@ -1,5 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosError } from 'axios';
+import { ValidationError } from 'yup';
 import {
   PROPS_AUTH,
   RESPONSE_AUTH,
@@ -9,9 +10,21 @@ import {
   PROPS_RESET_PASSWORD,
   PROPS_RESET_PASSWORD_CONFIRM,
   AUTH_STATE,
+  RESPONSE_REGISTER_SUCCESS,
+  RESPONSE_REGISTER_FAILURE,
 } from './types';
 import { RootState } from '../../app/store';
 import apiURL from '../share';
+import { RESPONSE_POST_FAVORITE } from '../folder/types';
+
+interface ValidationErrors {
+  errorMessage: string;
+  field_errors: Record<string, string>;
+}
+
+interface IErrorResponse {
+  detail: string;
+}
 
 export const fetchAsyncLogin = createAsyncThunk(
   'auth/login',
@@ -29,21 +42,30 @@ export const fetchAsyncLogin = createAsyncThunk(
   }
 );
 
-export const fetchAsyncRegister = createAsyncThunk(
-  'auth/register',
-  async (auth: PROPS_REGISTER) => {
-    const res = await axios.post<RESPONSE_REGISTER>(
-      `${apiURL}auth/users/`,
-      auth,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+export const fetchAsyncRegister = createAsyncThunk<
+  RESPONSE_REGISTER_SUCCESS,
+  PROPS_REGISTER,
+  { rejectValue: RESPONSE_REGISTER_FAILURE }
+>('auth/register', async (data: PROPS_REGISTER, { rejectWithValue }) => {
+  const res = await axios
+    .post<RESPONSE_REGISTER_SUCCESS>(`${apiURL}auth/users/`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
+      const res_data: RESPONSE_REGISTER_SUCCESS = response.data;
+      return res_data;
+    })
+    .catch((error: AxiosError<RESPONSE_REGISTER_FAILURE>) => {
+      if (!error.response) {
+        throw error;
       }
-    );
-    return res.data;
-  }
-);
+      return rejectWithValue(error.response.data);
+    });
+
+  return res;
+});
 
 export const fetchAsyncUserActivate = createAsyncThunk(
   'auth/user_activate',
@@ -81,9 +103,11 @@ export const fetchAsyncResetPasswordConfirm = createAsyncThunk(
 // authSliceのinitialState
 const authInitialState: AUTH_STATE = {
   isAuth: false,
+  isUserActive: false,
   isAfterRegister: false,
   isAfterResetPassword: false,
   isLoadingAuth: false,
+  errorMessages: [],
 };
 
 export const authSlice = createSlice({
@@ -120,17 +144,48 @@ export const authSlice = createSlice({
     resetIsAfterResetPassword(state) {
       state.isAfterResetPassword = false;
     },
+    setAuthErrorMessage(state, action: PayloadAction<string>) {
+      state.errorMessages = [action.payload];
+    },
+    resetAuthErrorMessage(state) {
+      state.errorMessages = [];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAsyncLogin.fulfilled, (state, action) => {
       localStorage.setItem('ajt', action.payload.access);
       state.isAuth = true;
     });
+    builder.addCase(fetchAsyncLogin.rejected, (state) => {
+      state.errorMessages = [
+        'メールアドレスまたはパスワードが間違っています。',
+      ];
+    });
     builder.addCase(fetchAsyncRegister.fulfilled, (state) => {
       state.isAfterRegister = true;
     });
+    builder.addCase(fetchAsyncRegister.rejected, (state, action) => {
+      if (action.payload) {
+        if (action.payload.email) {
+          state.errorMessages = action.payload.email;
+        } else if (action.payload.password) {
+          state.errorMessages = action.payload.password;
+        } else if (action.payload.re_password) {
+          state.errorMessages = action.payload.re_password;
+        }
+      }
+    });
     builder.addCase(fetchAsyncResetPassword.fulfilled, (state) => {
       state.isAfterResetPassword = true;
+    });
+    builder.addCase(fetchAsyncResetPassword.rejected, (state) => {
+      state.errorMessages = ['指定したメールアドレスのユーザーが存在しません'];
+    });
+    builder.addCase(fetchAsyncResetPasswordConfirm.rejected, (state) => {
+      state.errorMessages = ['このURLからパスワードを変更できません'];
+    });
+    builder.addCase(fetchAsyncUserActivate.fulfilled, (state) => {
+      state.isUserActive = true;
     });
   },
 });
@@ -144,14 +199,20 @@ export const {
   resetIsAfterRegister,
   setIsAfterResetPassword,
   resetIsAfterResetPassword,
+  setAuthErrorMessage,
+  resetAuthErrorMessage,
 } = authSlice.actions;
 
 export const selectIsAuth = (state: RootState): boolean => state.auth.isAuth;
+export const selectIsUserActive = (state: RootState): boolean =>
+  state.auth.isUserActive;
 export const selectIsLoadingAuth = (state: RootState): boolean =>
   state.auth.isLoadingAuth;
 export const selectIsAfterRegister = (state: RootState): boolean =>
   state.auth.isAfterRegister;
 export const selectIsAfterResetPassword = (state: RootState): boolean =>
   state.auth.isAfterResetPassword;
+export const selectAuthErrorMessage = (state: RootState): string[] =>
+  state.auth.errorMessages;
 
 export default authSlice.reducer;

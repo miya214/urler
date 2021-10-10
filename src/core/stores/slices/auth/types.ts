@@ -14,10 +14,20 @@ export interface PROPS_REGISTER {
   re_password: string;
 }
 
-export interface RESPONSE_REGISTER {
-  email: string;
+export interface RESPONSE_REGISTER_SUCCESS {
   id: string;
+  email: string;
 }
+
+export interface RESPONSE_REGISTER_FAILURE {
+  email: string[] | null;
+  password: string[] | null;
+  re_password: string[] | null;
+}
+
+export type RESPONSE_REGISTER =
+  | RESPONSE_REGISTER_SUCCESS
+  | RESPONSE_REGISTER_FAILURE;
 
 export interface PROPS_USER_ACTIVATE {
   uid: string;
@@ -35,9 +45,15 @@ export interface PROPS_RESET_PASSWORD_CONFIRM {
   re_new_password: string;
 }
 
+export interface RESPONSE_ERROR_MESSAGE {
+  detail: string;
+}
+
 export interface AUTH_STATE {
   isAuth: boolean;
+  isUserActive: boolean;
   isLoadingAuth: boolean;
   isAfterRegister: boolean;
   isAfterResetPassword: boolean;
+  errorMessages: string[];
 }

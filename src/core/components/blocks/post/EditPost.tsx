@@ -13,17 +13,15 @@ import {
 } from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
 
-import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
-
 import {
-  selectIsLoadingFolder,
-  selectOpenEditFolder,
-  fetchFolderStart,
-  fetchFolderEnd,
-  fetchAsyncUpdateFolder,
-  resetOpenEditFolder,
-  selectFolder,
-} from '../../../stores/slices/folder/folderSlice';
+  resetIsAuth,
+  setAuthErrorMessage,
+} from '../../../stores/slices/auth/authSlice';
+import {
+  setInfoMessage,
+  setIsExistInfoMessage,
+} from '../../../stores/slices/message/messageSlice';
+
 import {
   fetchPostStart,
   fetchPostEnd,
@@ -31,6 +29,10 @@ import {
   resetOpenEditPost,
   selectIsLoadingPost,
   selectOpenEditPost,
+  selectPostErrorMessages,
+  resetOpenNewPost,
+  setPostErrorMessage,
+  resetPostErrorMessage,
 } from '../../../stores/slices/post/postSlice';
 
 import ModalWrapper from '../../atoms/Modal/ModalWrapper';
@@ -45,6 +47,7 @@ import {
   SwitchLabel,
 } from '../../atoms/Form/FormElements';
 import SubmitButton from '../../atoms/Buttons/SubmitButton';
+import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 const EditPost: VFC<{
   id: string;
@@ -56,6 +59,7 @@ const EditPost: VFC<{
   const dispatch: AppDispatch = useDispatch();
   const isLoadingPost = useSelector(selectIsLoadingPost);
   const openEditPost = useSelector(selectOpenEditPost);
+  const postErrorMessages = useSelector(selectPostErrorMessages);
 
   return (
     <>
@@ -78,9 +82,21 @@ const EditPost: VFC<{
             dispatch(fetchPostStart());
             const result = await dispatch(fetchAsyncUpdatePost(values));
             if (fetchAsyncUpdatePost.rejected.match(result)) {
-              dispatch(resetIsAuth());
-              dispatch(resetOpenEditPost());
-              return;
+              if (result.payload) {
+                if (result.payload.code === 'token_not_valid') {
+                  dispatch(
+                    setAuthErrorMessage(
+                      'アクセストークンの有効期限が切れました。再ログインしてください'
+                    )
+                  );
+                  dispatch(resetIsAuth());
+                }
+              }
+            }
+            if (fetchAsyncUpdatePost.fulfilled.match(result)) {
+              dispatch(resetPostErrorMessage());
+              dispatch(setInfoMessage(`${values.name}を更新しました`));
+              dispatch(setIsExistInfoMessage());
             }
             dispatch(fetchPostEnd());
             dispatch(resetOpenEditPost());
@@ -107,64 +123,76 @@ const EditPost: VFC<{
             touched,
             isValid,
           }) => (
-            <form onSubmit={handleSubmit}>
-              <TxField
-                id="standard-basic"
-                variant="standard"
-                label="URL"
-                name="url"
-                type="input"
-                value={values.url}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {touched.url && errors.url ? (
-                <ErrorMessage>{errors.url}</ErrorMessage>
-              ) : null}
-              <TxField
-                id="standard-basic"
-                variant="standard"
-                label="名前"
-                name="name"
-                type="input"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {touched.name && errors.name ? (
-                <ErrorMessage>{errors.name}</ErrorMessage>
-              ) : null}
-              <br />
-              <TxField
-                id="standard-basic"
-                variant="standard"
-                label="説明"
-                name="text"
-                type="input"
-                value={values.text}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                multiline
-              />
-              {touched.text && errors.text ? (
-                <ErrorMessage>{errors.text}</ErrorMessage>
-              ) : null}
-              <br />
-              <BottomActions>
-                <CancelButton
-                  onClick={() => {
-                    dispatch(resetOpenEditPost());
-                  }}
-                >
-                  キャンセル
-                </CancelButton>
-                <SubmitButton
-                  isLoading={isLoadingPost}
-                  disabled={!isValid}
-                  ButtonText="作成"
+            <>
+              {postErrorMessages.map((message) => (
+                <ErrorAlert text={message} />
+              ))}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <TxField
+                  id="standard-basic"
+                  variant="standard"
+                  label="URL"
+                  name="url"
+                  type="input"
+                  value={values.url}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
-              </BottomActions>
-            </form>
+                {touched.url && errors.url ? (
+                  <ErrorMessage>{errors.url}</ErrorMessage>
+                ) : null}
+                <TxField
+                  id="standard-basic"
+                  variant="standard"
+                  label="名前"
+                  name="name"
+                  type="input"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                {touched.name && errors.name ? (
+                  <ErrorMessage>{errors.name}</ErrorMessage>
+                ) : null}
+                <br />
+                <TxField
+                  id="standard-basic"
+                  variant="standard"
+                  label="説明"
+                  name="text"
+                  type="input"
+                  value={values.text}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  multiline
+                />
+                {touched.text && errors.text ? (
+                  <ErrorMessage>{errors.text}</ErrorMessage>
+                ) : null}
+                <br />
+                <BottomActions>
+                  <CancelButton
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      dispatch(resetOpenEditPost());
+                    }}
+                  >
+                    キャンセル
+                  </CancelButton>
+                  <SubmitButton
+                    isLoading={isLoadingPost}
+                    disabled={!isValid}
+                    ButtonText="更新"
+                    clickFunc={handleSubmit}
+                  />
+                </BottomActions>
+              </form>
+            </>
           )}
         </Formik>
       </ModalWrapper>

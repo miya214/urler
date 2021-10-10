@@ -19,18 +19,22 @@ import {
 
 import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
 import Loading from '../../../atoms/Loader';
+import ErrorAlert from '../../../atoms/Alert/ErrorAlert';
 
 import {
   fetchCredStart,
   fetchCredEnd,
   selectIsLoadingAuth,
   fetchAsyncResetPassword,
+  selectAuthErrorMessage,
+  resetAuthErrorMessage,
 } from '../../../../stores/slices/auth/authSlice';
 
 const ResetPasswordPage: VFC = () => {
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const dispatch: AppDispatch = useDispatch();
   const history = useHistory();
+  const authErrorMessages = useSelector(selectAuthErrorMessage);
   return (
     <Formik
       initialErrors={{ email: 'required' }}
@@ -40,7 +44,8 @@ const ResetPasswordPage: VFC = () => {
         const result = await dispatch(fetchAsyncResetPassword(values));
 
         if (fetchAsyncResetPassword.fulfilled.match(result)) {
-          history.push('/password/reset/after');
+          dispatch(resetAuthErrorMessage());
+          history.replace('/password/reset/after');
         }
         dispatch(fetchCredEnd());
       }}
@@ -60,6 +65,9 @@ const ResetPasswordPage: VFC = () => {
         isValid,
       }) => (
         <AuthFormWrapper>
+          {authErrorMessages.map((message) => (
+            <ErrorAlert text={message} />
+          ))}
           <form onSubmit={handleSubmit}>
             <div>
               <AuthFormHeading>パスワードリセット</AuthFormHeading>

@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 export const MainHeader = styled.div`
   height: 100px;
-
   border-bottom: 1px solid #79bd9a;
 `;
 
@@ -17,7 +16,7 @@ export const MainHeaderLeftItems = styled.div`
   display: flex;
 `;
 
-export const MainHeaderTitle = styled.h3`
+export const MainHeaderTitle = styled.h4`
   color: #454545;
   line-height: 40px;
 `;
@@ -81,6 +80,7 @@ export const SearchResultCount = styled.p`
 `;
 
 export const SearchQueryParamsTexts = styled.div``;
+
 export const SearchQueryParamsText = styled.p`
   color: #454545;
   font-size: 10px;

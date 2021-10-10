@@ -6,6 +6,7 @@ import AuthButton from '../../../atoms/Buttons/AuthButton';
 const bgColor = '#fdfdfd';
 const borderColor = '#f9f9f9';
 const iconColor = '#79BD9A';
+const iconColorHover = '#00ff00';
 const txColor = '#79BD9A';
 const mainColor = '#00ff00';
 
@@ -19,7 +20,7 @@ export const NavBarWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000000000;
+  z-index: 200;
   border-bottom: 4px solid ${borderColor};
   box-shadow: 0px 0px 3px 0px;
 `;
@@ -27,15 +28,15 @@ export const NavBarWrapper = styled.div`
 export const TopBarLeftItems = styled.div`
   display: flex;
   line-height: 60px;
-  padding-top: 10px;
 `;
 
 export const MenuBars = styled.div`
   margin-left: 15px;
+  margin-top: 10px;
   font-size: 2rem;
   background: none;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 100;
   & svg {
     transition: 0.3s;
   }
@@ -46,9 +47,17 @@ export const MenuBars = styled.div`
   }
 `;
 
-export const AppLogo = styled.div`
+export const AppLogo = styled(Link)`
   color: ${iconColor};
-  margin-left: 30%;
+  margin-left: 20%;
+  font-size: 20px;
+  margin-top: 7px;
+  text-decoration: none;
+  transition: 0.3s;
+
+  &:hover {
+    color: ${iconColorHover};
+  }
 `;
 
 export const TopBarRightItems = styled.div`

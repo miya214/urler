@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useHistory, useLocation, Link } from 'react-router-dom';
-import { TextField, Button, CircularProgress } from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
 import {
   AuthFormWrapper,
@@ -17,19 +16,22 @@ import {
 
 import AuthFormButton from '../../atoms/Buttons/AuthFormButton';
 import Loading from '../../atoms/Loader';
+import ErrorAlert from '../../atoms/Alert/ErrorAlert';
+import InfoAlert from '../../atoms/Alert/InfoAlert';
 
 import {
   fetchCredStart,
   fetchCredEnd,
   selectIsLoadingAuth,
   fetchAsyncLogin,
+  selectAuthErrorMessage,
+  resetAuthErrorMessage,
 } from '../../../stores/slices/auth/authSlice';
+
 import {
-  fetchAsyncGetMyProf,
-  fetchProfStart,
-  fetchProfEnd,
-  selectMyProfile,
-} from '../../../stores/slices/profile/profileSlice';
+  setInfoMessage,
+  setIsExistInfoMessage,
+} from '../../../stores/slices/message/messageSlice';
 
 export interface LOCATION_FROM_PROPS {
   from: string;
@@ -40,6 +42,7 @@ const LoginPage: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
   const history = useHistory();
   const { state } = useLocation<LOCATION_FROM_PROPS>();
+  const authErrorMessages = useSelector(selectAuthErrorMessage);
   return (
     <Formik
       initialErrors={{ email: 'required' }}
@@ -47,11 +50,14 @@ const LoginPage: VFC = () => {
       onSubmit={async (values) => {
         dispatch(fetchCredStart());
         const result = await dispatch(fetchAsyncLogin(values));
-        dispatch(fetchCredEnd());
 
         if (fetchAsyncLogin.fulfilled.match(result)) {
-          history.push(state.from ?? '/');
+          dispatch(resetAuthErrorMessage());
+          dispatch(setInfoMessage('ログインしました'));
+          dispatch(setIsExistInfoMessage());
+          history.replace(state.from ?? '/');
         }
+        dispatch(fetchCredEnd());
       }}
       validationSchema={Yup.object().shape({
         email: Yup.string()
@@ -70,10 +76,14 @@ const LoginPage: VFC = () => {
         isValid,
       }) => (
         <AuthFormWrapper>
+          {authErrorMessages.map((message) => (
+            <ErrorAlert text={message} />
+          ))}
           <form onSubmit={handleSubmit}>
             <div>
               <AuthFormHeading>ログイン</AuthFormHeading>
               <br />
+
               <LoaderWrapper>{isLoadingAuth && <Loading />}</LoaderWrapper>
               <TxField
                 id="standard-basic"

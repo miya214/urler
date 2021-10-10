@@ -5,7 +5,10 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { CircularProgress } from '@material-ui/core';
 import Divider from '@mui/material/Divider';
 import { AppDispatch } from '../../../stores/app/store';
-import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
+import {
+  resetIsAuth,
+  setAuthErrorMessage,
+} from '../../../stores/slices/auth/authSlice';
 
 import { selectMyProfile } from '../../../stores/slices/profile/profileSlice';
 
@@ -24,10 +27,7 @@ import {
 import SearchBox from '../../atoms/Input/SearchBox';
 import OrderSelect from '../../atoms/OrderSelect';
 import FavoriteFolderOrderSelect from '../../atoms/FavoriteFolerOrderSelect';
-import {
-  resetPostsCount,
-  setIsExistPosts,
-} from '../../../stores/slices/post/postSlice';
+import { resetPosts } from '../../../stores/slices/post/postSlice';
 
 import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
 
@@ -46,6 +46,8 @@ import { FolderItemLink } from '../../blocks/folder/FolderElements';
 import SearchButton from '../../atoms/Buttons/SearchButton';
 import Loading from '../../atoms/Loader';
 import MainHeader from '../../blocks/main/MainHeader';
+
+import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
 
 const FavoriteFoldersPage: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -78,12 +80,18 @@ const FavoriteFoldersPage: VFC = () => {
       })
     );
     if (fetchAsyncGetFavoriteFolders.rejected.match(result)) {
+      dispatch(
+        setAuthErrorMessage(
+          'アクセストークンの有効期限が切れました。再ログインしてください'
+        )
+      );
       dispatch(resetIsAuth());
     }
   };
 
   const searchFolder = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    window.scrollTo({ top: 0 });
     setHasMore(true);
     dispatch(setIsExistFavoriteFolders());
     dispatch(fetchFolderStart());
@@ -96,6 +104,11 @@ const FavoriteFoldersPage: VFC = () => {
       })
     );
     if (fetchAsyncGetFavoriteFolders.rejected.match(result)) {
+      dispatch(
+        setAuthErrorMessage(
+          'アクセストークンの有効期限が切れました。再ログインしてください'
+        )
+      );
       dispatch(resetIsAuth());
     }
     dispatch(fetchFolderEnd());
@@ -117,9 +130,8 @@ const FavoriteFoldersPage: VFC = () => {
             key={folder.id}
             to={`/folder/${folder.id}`}
             onClick={() => {
-              dispatch(resetPostsCount());
               dispatch(setFolder(folder));
-              dispatch(setIsExistPosts());
+              dispatch(resetPosts());
             }}
           >
             <FolderListItem folder={folder} />
@@ -138,6 +150,11 @@ const FavoriteFoldersPage: VFC = () => {
 
   return (
     <>
+      <MainHeader
+        title="Favorite"
+        isHistory={false}
+        buttonElem={<TopLinkButton />}
+      />
       <MainBody>
         <SearchSection>
           <SearchContent>

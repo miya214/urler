@@ -1,5 +1,7 @@
 import { VFC, ReactNode, ReactElement } from 'react';
 import { Modal, Box } from '@material-ui/core';
+import Backdrop from '@mui/material/Backdrop';
+import Fade from '@mui/material/Fade';
 import ModalBox from './ModalElements';
 
 const styles = {
@@ -22,11 +24,19 @@ const ModalWrapper: VFC<{
 }> = ({ isOpen, closeFunc, children }) => (
   <Modal
     open={isOpen}
+    keepMounted
     onClose={closeFunc}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
+    closeAfterTransition
+    BackdropComponent={Backdrop}
+    BackdropProps={{
+      timeout: 500,
+    }}
   >
-    <ModalBox>{children}</ModalBox>
+    <Fade in={isOpen}>
+      <ModalBox>{children}</ModalBox>
+    </Fade>
   </Modal>
 );
 

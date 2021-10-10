@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
 import apiURL from '../share';
 
@@ -11,6 +11,7 @@ import {
   FOLDERS,
   FOLDER_WITHOUT_FAVORITE,
   FOLDERS_WITHOUT_FAVORITE,
+  RESPONSE_CREATE_FOLDER_FAILURE,
   FOLDER_STATE,
   PROPS_QUERY_PARAMS_GET_FOLDERS,
   PROPS_QUERY_PARAMS_GET_MYFOLDERS,
@@ -34,15 +35,9 @@ export const fetchAsyncGetFolder = createAsyncThunk(
 
 export const fetchAsyncGetMyFolders = createAsyncThunk(
   'myfolders/get',
-  async (params: PROPS_QUERY_PARAMS_GET_MYFOLDERS, { rejectWithValue }) => {
-    let url = `${apiURL}api/v1/myfolder/`;
-    if (params.url) {
-      url = params.url;
-    } else {
-      url += `?ordering=${params.ordering}&public=${params.public}&search=${params.search}`;
-    }
+  async (_, { rejectWithValue }) => {
     if (typeof localStorage.ajt === 'string') {
-      const res = await axios.get<FOLDERS>(url, {
+      const res = await axios.get<FOLDER[]>(`${apiURL}api/v1/myfolder/`, {
         headers: {
           Authorization: `JWT ${localStorage.ajt}`,
         },
@@ -52,6 +47,26 @@ export const fetchAsyncGetMyFolders = createAsyncThunk(
     return rejectWithValue({ errorMessage: 'ログインしていません' });
   }
 );
+// export const fetchAsyncGetMyFolders = createAsyncThunk(
+//   'myfolders/get',
+//   async (params: PROPS_QUERY_PARAMS_GET_MYFOLDERS, { rejectWithValue }) => {
+//     let url = `${apiURL}api/v1/myfolder/`;
+//     if (params.url) {
+//       url = params.url;
+//     } else {
+//       url += `?ordering=${params.ordering}&public=${params.public}&search=${params.search}`;
+//     }
+//     if (typeof localStorage.ajt === 'string') {
+//       const res = await axios.get<FOLDERS>(url, {
+//         headers: {
+//           Authorization: `JWT ${localStorage.ajt}`,
+//         },
+//       });
+//       return res.data;
+//     }
+//     return rejectWithValue({ errorMessage: 'ログインしていません' });
+//   }
+// );
 
 export const fetchAsyncGetFolders = createAsyncThunk(
   'folders/get',
@@ -95,49 +110,96 @@ export const fetchAsyncGetFavoriteFolders = createAsyncThunk(
   }
 );
 
-export const fetchAsyncCreateFolder = createAsyncThunk(
-  'folder/post',
-  async (folder: PROPS_CREATE_FOLDER, { rejectWithValue }) => {
-    const data = {
-      name: folder.name,
-      public: folder.public,
-    };
-    if (typeof localStorage.ajt === 'string') {
-      const res = await axios.post<FOLDER>(`${apiURL}api/v1/folder/`, data, {
+export const fetchAsyncCreateFolder = createAsyncThunk<
+  FOLDER,
+  PROPS_CREATE_FOLDER,
+  { rejectValue: RESPONSE_CREATE_FOLDER_FAILURE }
+>('folder/post', async (folder: PROPS_CREATE_FOLDER, { rejectWithValue }) => {
+  const data = {
+    name: folder.name,
+    public: folder.public,
+  };
+  if (typeof localStorage.ajt === 'string') {
+    const res = await axios
+      .post<FOLDER>(`${apiURL}api/v1/folder/`, data, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `JWT ${localStorage.ajt}`,
         },
-      });
-      return res.data;
-    }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
-  }
-);
-
-export const fetchAsyncUpdateFolder = createAsyncThunk(
-  'folder/put',
-  async (folder: PROPS_UPDATE_FOLDER, { rejectWithValue }) => {
-    const data = {
-      name: folder.name,
-      public: folder.public,
-    };
-    if (typeof localStorage.ajt === 'string') {
-      const res = await axios.put<FOLDER>(
-        `${apiURL}api/v1/folder/${folder.id}/`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `JWT ${localStorage.ajt}`,
-          },
+      })
+      .then((response) => {
+        const res_data: FOLDER = response.data;
+        return res_data;
+      })
+      .catch((error: AxiosError<RESPONSE_CREATE_FOLDER_FAILURE>) => {
+        if (!error.response) {
+          throw error;
         }
-      );
-      return res.data;
-    }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
+        return rejectWithValue(error.response.data);
+      });
+    return res;
   }
-);
+  return rejectWithValue({
+    name: [],
+    auth: ['ログインまたはアカウントの作成を行ってください'],
+    code: '',
+  });
+});
+// export const fetchAsyncCreateFolder = createAsyncThunk(
+//   'folder/post',
+//   async (folder: PROPS_CREATE_FOLDER, { rejectWithValue }) => {
+//     const data = {
+//       name: folder.name,
+//       public: folder.public,
+//     };
+//     if (typeof localStorage.ajt === 'string') {
+//       const res = await axios.post<FOLDER>(`${apiURL}api/v1/folder/`, data, {
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `JWT ${localStorage.ajt}`,
+//         },
+//       });
+//       return res.data;
+//     }
+//     return rejectWithValue({ errorMessage: 'ログインしていません' });
+//   }
+// );
+
+export const fetchAsyncUpdateFolder = createAsyncThunk<
+  FOLDER,
+  PROPS_UPDATE_FOLDER,
+  { rejectValue: RESPONSE_CREATE_FOLDER_FAILURE }
+>('folder/put', async (folder: PROPS_UPDATE_FOLDER, { rejectWithValue }) => {
+  const data = {
+    name: folder.name,
+    public: folder.public,
+  };
+  if (typeof localStorage.ajt === 'string') {
+    const res = await axios
+      .put<FOLDER>(`${apiURL}api/v1/folder/${folder.id}/`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${localStorage.ajt}`,
+        },
+      })
+      .then((response) => {
+        const res_data: FOLDER = response.data;
+        return res_data;
+      })
+      .catch((error: AxiosError<RESPONSE_CREATE_FOLDER_FAILURE>) => {
+        if (!error.response) {
+          throw error;
+        }
+        return rejectWithValue(error.response.data);
+      });
+    return res;
+  }
+  return rejectWithValue({
+    name: [],
+    auth: ['ログインまたはアカウントの作成を行ってください'],
+    code: '',
+  });
+});
 
 export const fetchAsyncDeleteFolder = createAsyncThunk(
   'folder/delete',
@@ -183,6 +245,8 @@ const folderInitialState: FOLDER_STATE = {
   openNewFolder: false,
   openEditFolder: false,
   openDeleteFolder: false,
+  numOfFavorite: 0,
+  errorMessages: [],
   folder: {
     id: '',
     user: '',
@@ -191,21 +255,35 @@ const folderInitialState: FOLDER_STATE = {
     posts_add: '',
     favorite: [],
   },
-  myfolders: {
-    count: 0,
-    next: null,
-    previous: null,
-    results: [
-      {
-        id: '',
-        user: '',
-        name: '',
-        public: false,
-        posts_add: '',
-        favorite: [],
-      },
-    ],
-  },
+  myfolders: [
+    {
+      id: '',
+      user: '',
+      name: '',
+      public: false,
+      posts_add: '',
+      favorite: [],
+    },
+  ],
+
+  // myfolders: {
+  //   count: 0,
+  //   next: null,
+  //   previous: null,
+  //   results: [
+  //     {
+  //       id: '',
+  //       user: '',
+  //       name: '',
+  //       public: false,
+  //       posts_add: '',
+  //       favorite: [],
+  //     },
+  //   ],
+  // },
+
+  // 追加
+  myfoldersSearchResult: [],
   folders: {
     count: 0,
     next: null,
@@ -307,13 +385,24 @@ const folderSlice = createSlice({
       state.openDeleteFolder = false;
     },
     resetMyFoldersCount(state) {
-      state.myfolders.count = 0;
+      state.myfolders = [];
+      // 追加
+      state.myfoldersSearchResult = [];
     },
+    // resetMyFoldersCount(state) {
+    //   state.myfolders.count = 0;
+    // },
     resetFoldersCount(state) {
       state.folders.count = 0;
     },
     resetFavoriteFoldersCount(state) {
       state.favoritefolders.count = 0;
+    },
+    setFolderErrorMessage(state, action: PayloadAction<string>) {
+      state.errorMessages = [action.payload];
+    },
+    resetFolderErrorMessage(state) {
+      state.errorMessages = [];
     },
     setFolder(state, action: PayloadAction<PROPS_SET_FOLDER>) {
       state.folder = {
@@ -324,6 +413,31 @@ const folderSlice = createSlice({
         posts_add: action.payload.posts_add,
         favorite: action.payload.favorite,
       };
+    },
+    searchMyFolders(
+      state,
+      action: PayloadAction<PROPS_QUERY_PARAMS_GET_MYFOLDERS>
+    ) {
+      const folders = state.myfolders.concat();
+      let folders_sort = folders;
+      if (action.payload.ordering === 'posts_add') {
+        folders_sort = folders.reverse();
+      }
+
+      state.myfoldersSearchResult = folders_sort.filter((folder) => {
+        if (folder.name.includes(action.payload.search)) {
+          if (action.payload.public === '') {
+            return true;
+          }
+          if (String(folder.public) === action.payload.public) {
+            return true;
+          }
+        }
+        return false;
+      });
+      if (state.myfoldersSearchResult.length === 0) {
+        state.hasMyFolder = false;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -345,19 +459,31 @@ const folderSlice = createSlice({
       }
     });
     builder.addCase(fetchAsyncGetMyFolders.fulfilled, (state, action) => {
-      if (state.myfolders.count === 0) {
-        state.myfolders = action.payload;
-      } else {
-        state.myfolders.results = state.myfolders.results.concat(
-          action.payload.results
-        );
-        state.myfolders.next = action.payload.next;
-        state.myfolders.previous = action.payload.previous;
-      }
-      if (action.payload.count === 0) {
+      state.myfolders = action.payload;
+      state.myfoldersSearchResult = action.payload;
+      if (action.payload.length === 0) {
         state.hasMyFolder = false;
       }
+      let favoriteNum = 0;
+      state.myfolders.forEach((folder) => {
+        favoriteNum += folder.favorite.length;
+      });
+      state.numOfFavorite = favoriteNum;
     });
+    // builder.addCase(fetchAsyncGetMyFolders.fulfilled, (state, action) => {
+    //   if (state.myfolders.count === 0) {
+    //     state.myfolders = action.payload;
+    //   } else {
+    //     state.myfolders.results = state.myfolders.results.concat(
+    //       action.payload.results
+    //     );
+    //     state.myfolders.next = action.payload.next;
+    //     state.myfolders.previous = action.payload.previous;
+    //   }
+    //   if (action.payload.count === 0) {
+    //     state.hasMyFolder = false;
+    //   }
+    // });
     builder.addCase(fetchAsyncGetFavoriteFolders.fulfilled, (state, action) => {
       if (state.favoritefolders.count === 0) {
         state.favoritefolders = action.payload;
@@ -373,19 +499,60 @@ const folderSlice = createSlice({
       }
     });
     builder.addCase(fetchAsyncCreateFolder.fulfilled, (state, action) => {
-      state.myfolders.results.unshift(action.payload);
+      state.myfolders.unshift(action.payload);
+      state.myfoldersSearchResult = state.myfolders;
+      state.hasMyFolder = true;
     });
+    builder.addCase(fetchAsyncCreateFolder.rejected, (state, action) => {
+      if (action.payload) {
+        if (action.payload.name) {
+          state.errorMessages = action.payload.name;
+        }
+      }
+    });
+    // builder.addCase(fetchAsyncCreateFolder.fulfilled, (state, action) => {
+    //   state.myfolders.results.unshift(action.payload);
+    // });
     builder.addCase(fetchAsyncUpdateFolder.fulfilled, (state, action) => {
       state.folder = action.payload;
-      state.myfolders.results = state.myfolders.results.map((folder) =>
+      state.myfolders = state.myfolders.map((folder) =>
         folder.id === action.payload.id ? action.payload : folder
       );
+      state.myfoldersSearchResult = state.myfolders;
     });
+    builder.addCase(fetchAsyncUpdateFolder.rejected, (state, action) => {
+      if (action.payload) {
+        if (action.payload.name) {
+          state.errorMessages = action.payload.name;
+        }
+      }
+    });
+    // builder.addCase(fetchAsyncUpdateFolder.fulfilled, (state, action) => {
+    //   state.folder = action.payload;
+    //   state.myfolders.results = state.myfolders.results.map((folder) =>
+    //     folder.id === action.payload.id ? action.payload : folder
+    //   );
+    // });
     builder.addCase(fetchAsyncDeleteFolder.fulfilled, (state, action) => {
-      state.myfolders.results = state.myfolders.results.filter(
+      state.myfolders = state.myfolders.filter(
         (folder) => folder.id !== action.payload
       );
+      state.folders.results = state.folders.results.filter(
+        (folder) => folder.id !== action.payload
+      );
+      state.favoritefolders.results = state.favoritefolders.results.filter(
+        (result) => result.folder.id !== action.payload
+      );
+      state.myfoldersSearchResult = state.myfolders;
+      if (state.myfolders.length === 0) {
+        state.hasMyFolder = false;
+      }
     });
+    // builder.addCase(fetchAsyncDeleteFolder.fulfilled, (state, action) => {
+    //   state.myfolders.results = state.myfolders.results.filter(
+    //     (folder) => folder.id !== action.payload
+    //   );
+    // });
     builder.addCase(fetchAsyncPostFavorite.fulfilled, (state, action) => {
       const currentfolder = state.folder;
       const folderWithoutFavorite = {
@@ -425,6 +592,8 @@ export const {
   resetIsExistFolders,
   setIsExistFavoriteFolders,
   resetIsExistFavoriteFolders,
+  setFolderErrorMessage,
+  resetFolderErrorMessage,
   setHasMyFolder,
   resetHasMyFolder,
   setOpenNewFolder,
@@ -434,6 +603,7 @@ export const {
   setOpenDeleteFolder,
   resetOpenDeleteFolder,
   setFolder,
+  searchMyFolders,
 } = folderSlice.actions;
 
 export const selectIsLoadingFolder = (state: RootState): boolean =>
@@ -448,8 +618,17 @@ export const selectIsLoadingFavorite = (state: RootState): boolean =>
   state.folder.isLoadingFavorite;
 export const selectIsSetFolder = (state: RootState): boolean =>
   state.folder.isSetFolder;
-export const selectMyFolders = (state: RootState): FOLDERS =>
+export const selectNumOfFavorite = (state: RootState): number =>
+  state.folder.numOfFavorite;
+export const selectFolderErrorMessages = (state: RootState): string[] =>
+  state.folder.errorMessages;
+export const selectMyFolders = (state: RootState): FOLDER[] =>
   state.folder.myfolders;
+// 追加
+export const selectMyFoldersSearchResult = (state: RootState): FOLDER[] =>
+  state.folder.myfoldersSearchResult;
+// export const selectMyFolders = (state: RootState): FOLDERS =>
+//   state.folder.myfolders;
 export const selectFolders = (state: RootState): FOLDERS =>
   state.folder.folders;
 export const selectFavoriteFolders = (

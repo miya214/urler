@@ -10,7 +10,10 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../stores/app/store';
 
-import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
+import {
+  resetIsAuth,
+  setAuthErrorMessage,
+} from '../../../stores/slices/auth/authSlice';
 
 import {
   selectIsLoadingProf,
@@ -21,6 +24,8 @@ import {
   fetchProfEnd,
   fetchAsyncUpdateProf,
   editNickname,
+  selectProfileErrorMessages,
+  resetProfileErrorMessage,
 } from '../../../stores/slices/profile/profileSlice';
 
 import ModalWrapper from '../../atoms/Modal/ModalWrapper';
@@ -31,19 +36,13 @@ import {
   CancelButton,
 } from '../../atoms/Form/FormElements';
 
-import SubmitButton from '../../atoms/Buttons/SubmitButton';
+import {
+  setInfoMessage,
+  setIsExistInfoMessage,
+} from '../../../stores/slices/message/messageSlice';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+import SubmitButton from '../../atoms/Buttons/SubmitButton';
+import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 const EditProfile: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -51,9 +50,10 @@ const EditProfile: VFC = () => {
   const isLoadingProf = useSelector(selectIsLoadingProf);
   const openProfile = useSelector(selectOpenProfile);
   const profile = useSelector(selectMyProfile);
+  const profileErrorMessages = useSelector(selectProfileErrorMessages);
 
   return (
-    <div>
+    <>
       <ModalWrapper
         isOpen={openProfile}
         closeFunc={() => dispatch(resetOpenProfile())}
@@ -62,21 +62,26 @@ const EditProfile: VFC = () => {
           initialErrors={{ nickname: 'required' }}
           initialValues={{ id: profile.id, nickname: profile.nickname }}
           onSubmit={async (values) => {
-            dispatch(fetchProfStart());
             dispatch(editNickname(values.nickname));
             const result = await dispatch(fetchAsyncUpdateProf(values));
             if (fetchAsyncUpdateProf.rejected.match(result)) {
-              dispatch(resetIsAuth());
-              dispatch(resetOpenProfile());
-              history.push({
-                pathname: '/login',
-                state: {
-                  from: '/mypage',
-                },
-              });
-              return;
+              if (result.payload) {
+                if (result.payload.code === 'token_not_valid') {
+                  dispatch(
+                    setAuthErrorMessage(
+                      'アクセストークンの有効期限が切れました。再ログインしてください'
+                    )
+                  );
+                  dispatch(resetIsAuth());
+                }
+              }
             }
-            dispatch(fetchProfEnd());
+            if (fetchAsyncUpdateProf.fulfilled.match(result)) {
+              dispatch(resetProfileErrorMessage());
+              dispatch(setInfoMessage('プロフィールを更新しました'));
+              dispatch(setIsExistInfoMessage());
+            }
+
             dispatch(resetOpenProfile());
           }}
           validationSchema={Yup.object().shape({
@@ -94,40 +99,52 @@ const EditProfile: VFC = () => {
             touched,
             isValid,
           }) => (
-            <form onSubmit={handleSubmit}>
-              <TxField
-                id="standard-basic"
-                variant="standard"
-                label="nickname"
-                name="nickname"
-                type="input"
-                value={values.nickname}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {touched.nickname && errors.nickname ? (
-                <ErrorMessage>{errors.nickname}</ErrorMessage>
-              ) : null}
-              <br />
-              <BottomActions>
-                <CancelButton
-                  onClick={() => {
-                    dispatch(resetOpenProfile());
-                  }}
-                >
-                  キャンセル
-                </CancelButton>
-                <SubmitButton
-                  isLoading={isLoadingProf}
-                  disabled={!isValid}
-                  ButtonText="更新"
+            <>
+              {profileErrorMessages.map((message) => (
+                <ErrorAlert text={message} />
+              ))}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <TxField
+                  id="standard-basic"
+                  variant="standard"
+                  label="nickname"
+                  name="nickname"
+                  type="input"
+                  value={values.nickname}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
-              </BottomActions>
-            </form>
+                {touched.nickname && errors.nickname ? (
+                  <ErrorMessage>{errors.nickname}</ErrorMessage>
+                ) : null}
+                <br />
+                <BottomActions>
+                  <CancelButton
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      dispatch(resetOpenProfile());
+                    }}
+                  >
+                    キャンセル
+                  </CancelButton>
+                  <SubmitButton
+                    isLoading={isLoadingProf}
+                    disabled={!isValid}
+                    ButtonText="更新"
+                    clickFunc={handleSubmit}
+                  />
+                </BottomActions>
+              </form>
+            </>
           )}
         </Formik>
       </ModalWrapper>
-    </div>
+    </>
   );
 };
 

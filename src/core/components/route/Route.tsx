@@ -1,13 +1,12 @@
 import { VFC } from 'react';
 import { BrowserRouter as Router, Switch } from 'react-router-dom';
 
-import logo from '../../../logo.svg';
 import '../../App.css';
 
 import Navbar from '../blocks/bar/navbar/Navbar';
 import Sidebar from '../blocks/bar/sidebar/Sidebar';
-import Message from '../blocks/message/Message';
-
+import InfoAlert from '../atoms/Alert/InfoAlert';
+import MessageWrapper from '../blocks/message/MessageWrapper';
 import LoginPage from '../pages/auth/Login';
 import SignUpPage from '../pages/auth/SignUp/SignUp';
 import SignUpAfterPage from '../pages/auth/SignUp/SignUpAfter';
@@ -15,23 +14,26 @@ import UserActivePage from '../pages/auth/SignUp/UserActive';
 import ResetPasswordPage from '../pages/auth/ResetPassword/ResetPassword';
 import ResetPasswordAfterPage from '../pages/auth/ResetPassword/ResetPasswordAfter';
 import ResetPasswordCofirmPage from '../pages/auth/ResetPassword/ResetPasswordConfirm';
-import TopPage from '../pages/top/Top';
+// import TopPage from '../pages/top/Top';
+// 追加
 import Profile from '../pages/profile/Profile';
+import MyFoldersPage from '../pages/folder/MyFolders';
 import FolderDetail from '../pages/folder/FolderDetail';
 import FoldersPage from '../pages/folder/Folders';
 import FavoriteFoldersPage from '../pages/folder/FavoriteFolders';
 
 import PrivateRoute from './PrivateRoute';
 import UnAuthRoute from './UnAuthRoute';
+import ScrollToTop from './ScrollToTop';
 
-import { MainElems, Footer } from './RouteElements';
+import { MainElems } from './RouteElements';
 
 const RouteComponent: VFC = () => (
   <Router>
+    <ScrollToTop />
     <Sidebar />
     <Navbar />
     <MainElems>
-      <Message />
       <Switch>
         <UnAuthRoute exact path="/login" component={LoginPage} />
         <UnAuthRoute exact path="/signup" component={SignUpPage} />
@@ -58,7 +60,7 @@ const RouteComponent: VFC = () => (
           component={ResetPasswordAfterPage}
         />
         <PrivateRoute exact path="/">
-          <TopPage />
+          <MyFoldersPage />
         </PrivateRoute>
         <PrivateRoute exact path="/mypage">
           <Profile />
@@ -74,6 +76,7 @@ const RouteComponent: VFC = () => (
         </PrivateRoute>
       </Switch>
     </MainElems>
+    <InfoAlert />
   </Router>
 );
 

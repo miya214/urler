@@ -1,9 +1,15 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
 import apiURL from '../share';
 
-import { PROPS_PROFILE, PROPS_NICKNAME, PROFILE, PROFILE_STATE } from './types';
+import {
+  PROPS_PROFILE,
+  PROPS_NICKNAME,
+  PROFILE,
+  PROFILE_STATE,
+  RESPONSE_UPDATE_PROFILE_FAILURE,
+} from './types';
 
 export const fetchAsyncGetMyProf = createAsyncThunk(
   'myprofile/get',
@@ -16,7 +22,9 @@ export const fetchAsyncGetMyProf = createAsyncThunk(
       });
       return res.data[0];
     }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
+    return rejectWithValue({
+      code: 'token_not_exist',
+    });
   }
 );
 
@@ -31,7 +39,9 @@ export const fetchAsyncGetProfs = createAsyncThunk(
       });
       return res.data;
     }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
+    return rejectWithValue({
+      errorMessage: 'ログインまたはアカウントの作成を行ってください',
+    });
   }
 );
 
@@ -50,36 +60,73 @@ export const fetchAsyncCreateProf = createAsyncThunk(
       });
       return res.data;
     }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
+    return rejectWithValue({
+      errorMessage: 'ログインまたはアカウントの作成を行ってください',
+    });
   }
 );
 
-export const fetchAsyncUpdateProf = createAsyncThunk(
-  'profile/put',
-  async (profile: PROPS_PROFILE, { rejectWithValue }) => {
-    const data = {
-      nickname: profile.nickname,
-    };
-    if (typeof localStorage.ajt === 'string') {
-      const res = await axios.put<PROFILE>(
-        `${apiURL}api/v1/profile/${profile.id}/`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `JWT ${localStorage.ajt}`,
-          },
+export const fetchAsyncUpdateProf = createAsyncThunk<
+  PROFILE,
+  PROPS_PROFILE,
+  { rejectValue: RESPONSE_UPDATE_PROFILE_FAILURE }
+>('profile/put', async (profile: PROPS_PROFILE, { rejectWithValue }) => {
+  const data = {
+    nickname: profile.nickname,
+  };
+  if (typeof localStorage.ajt === 'string') {
+    const res = await axios
+      .put<PROFILE>(`${apiURL}api/v1/profile/${profile.id}/`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${localStorage.ajt}`,
+        },
+      })
+      .then((response) => {
+        const res_data: PROFILE = response.data;
+        return res_data;
+      })
+      .catch((error: AxiosError<RESPONSE_UPDATE_PROFILE_FAILURE>) => {
+        if (!error.response) {
+          throw error;
         }
-      );
-      return res.data;
-    }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
+        return rejectWithValue(error.response.data);
+      });
+    return res;
   }
-);
+  return rejectWithValue({
+    nickname: [],
+    auth: ['ログインまたはアカウントの作成を行ってください'],
+    code: '',
+  });
+});
+// export const fetchAsyncUpdateProf = createAsyncThunk(
+//   'profile/put',
+//   async (profile: PROPS_PROFILE, { rejectWithValue }) => {
+//     const data = {
+//       nickname: profile.nickname,
+//     };
+//     if (typeof localStorage.ajt === 'string') {
+//       const res = await axios.put<PROFILE>(
+//         `${apiURL}api/v1/profile/${profile.id}/`,
+//         data,
+//         {
+//           headers: {
+//             'Content-Type': 'application/json',
+//             Authorization: `JWT ${localStorage.ajt}`,
+//           },
+//         }
+//       );
+//       return res.data;
+//     }
+//     return rejectWithValue({ errorMessage: 'ログインしていません' });
+//   }
+// );
 
 const profileInitialState: PROFILE_STATE = {
   isLoadingProf: false,
   openProfile: false,
+  errorMessages: [],
   myprofile: {
     id: 0,
     user: '',
@@ -114,6 +161,12 @@ const profileSlice = createSlice({
     resetOpenProfile(state) {
       state.openProfile = false;
     },
+    setProfileErrorMessage(state, action: PayloadAction<string>) {
+      state.errorMessages = [action.payload];
+    },
+    resetProfileErrorMessage(state) {
+      state.errorMessages = [];
+    },
     editNickname(state, action: PayloadAction<string>) {
       state.myprofile.nickname = action.payload;
     },
@@ -137,6 +190,13 @@ const profileSlice = createSlice({
         prof.id === action.payload.id ? action.payload : prof
       );
     });
+    builder.addCase(fetchAsyncUpdateProf.rejected, (state, action) => {
+      if (action.payload) {
+        if (action.payload.nickname) {
+          state.errorMessages = action.payload.nickname;
+        }
+      }
+    });
   },
 });
 
@@ -145,6 +205,8 @@ export const {
   fetchProfEnd,
   setOpenProfile,
   resetOpenProfile,
+  setProfileErrorMessage,
+  resetProfileErrorMessage,
   editNickname,
   resetProfile,
 } = profileSlice.actions;
@@ -153,6 +215,8 @@ export const selectIsLoadingProf = (state: RootState): boolean =>
   state.profile.isLoadingProf;
 export const selectOpenProfile = (state: RootState): boolean =>
   state.profile.openProfile;
+export const selectProfileErrorMessages = (state: RootState): string[] =>
+  state.profile.errorMessages;
 export const selectMyProfile = (state: RootState): PROFILE =>
   state.profile.myprofile;
 export const selectProfiles = (state: RootState): PROFILE[] =>

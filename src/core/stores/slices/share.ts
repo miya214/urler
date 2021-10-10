@@ -1,3 +1,3 @@
-const apiURL = 'http://localhost:8000/';
+const apiURL = 'https://url-management-app.herokuapp.com/';
 
 export default apiURL;

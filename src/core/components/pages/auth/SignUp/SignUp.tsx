@@ -18,28 +18,34 @@ import {
 
 import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
 import Loading from '../../../atoms/Loader';
+import ErrorAlert from '../../../atoms/Alert/ErrorAlert';
 
 import {
   fetchCredStart,
   fetchCredEnd,
   selectIsLoadingAuth,
   fetchAsyncRegister,
+  selectAuthErrorMessage,
+  resetAuthErrorMessage,
 } from '../../../../stores/slices/auth/authSlice';
 
 const SignUpPage: VFC = () => {
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const dispatch: AppDispatch = useDispatch();
   const history = useHistory();
+  const authErrorMessages = useSelector(selectAuthErrorMessage);
   return (
     <Formik
       initialErrors={{ email: 'required' }}
       initialValues={{ email: '', password: '', re_password: '' }}
       onSubmit={async (values) => {
         dispatch(fetchCredStart());
+        dispatch(resetAuthErrorMessage());
         const resultReg = await dispatch(fetchAsyncRegister(values));
 
         if (fetchAsyncRegister.fulfilled.match(resultReg)) {
-          history.push('/signup/after');
+          dispatch(resetAuthErrorMessage());
+          history.replace('/signup/after');
         }
         dispatch(fetchCredEnd());
       }}
@@ -49,11 +55,11 @@ const SignUpPage: VFC = () => {
           .required('メールアドレスを入力してください'),
         password: Yup.string()
           .required('パスワードを入力してください')
-          .min(8, 'パスワードは8文字以上で設定してください'),
+          .min(8, 'パスワードは9文字以上で設定してください'),
         re_password: Yup.string()
           .required('確認用のパスワードを入力してください')
           .oneOf([Yup.ref('password'), null], 'パスワードが一致しません')
-          .min(8, 'パスワードは8文字以上で設定してください'),
+          .min(8, 'パスワードは9文字以上で設定してください'),
       })}
     >
       {({
@@ -66,6 +72,9 @@ const SignUpPage: VFC = () => {
         isValid,
       }) => (
         <AuthFormWrapper>
+          {authErrorMessages.map((message) => (
+            <ErrorAlert text={message} />
+          ))}
           <form onSubmit={handleSubmit}>
             <div>
               <AuthFormHeading>新規登録</AuthFormHeading>

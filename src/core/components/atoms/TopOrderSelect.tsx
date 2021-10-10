@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-const FavoriteFolderOrderSelect: VFC<{
+const OrderSelect: VFC<{
   selectValue: string;
   changeEvent: (e: SelectChangeEvent<string>) => void;
 }> = ({ selectValue, changeEvent }) => (
@@ -26,4 +26,4 @@ const FavoriteFolderOrderSelect: VFC<{
   </Box>
 );
 
-export default FavoriteFolderOrderSelect;
+export default OrderSelect;

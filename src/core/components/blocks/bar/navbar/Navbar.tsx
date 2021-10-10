@@ -10,12 +10,21 @@ import { AppDispatch } from '../../../../stores/app/store';
 import {
   selectIsAuth,
   resetIsAuth,
+  setAuthErrorMessage,
 } from '../../../../stores/slices/auth/authSlice';
+
+import {
+  setInfoMessage,
+  setIsExistInfoMessage,
+} from '../../../../stores/slices/message/messageSlice';
 
 import {
   resetIsSetFolder,
   resetFoldersCount,
   resetMyFoldersCount,
+  fetchFolderStart,
+  fetchFolderEnd,
+  fetchAsyncGetMyFolders,
 } from '../../../../stores/slices/folder/folderSlice';
 
 import {
@@ -55,7 +64,6 @@ import logo from '../../../../../logo.svg';
 import AuthButton from '../../../atoms/Buttons/AuthButtonSub';
 
 const Navbar: VFC = () => {
-  const hoge = 'hoge';
   const dispatch: AppDispatch = useDispatch();
   const isAuth = useSelector(selectIsAuth);
   const activeIndex = useSelector(selectActiveIndex);
@@ -66,7 +74,22 @@ const Navbar: VFC = () => {
   useEffect(() => {
     const getMyProf = async () => {
       dispatch(fetchProfStart());
-      await dispatch(fetchAsyncGetMyProf());
+      const result = await dispatch(fetchAsyncGetMyProf());
+      if (fetchAsyncGetMyProf.rejected.match(result)) {
+        dispatch(
+          setAuthErrorMessage(
+            'アクセストークンの有効期限が切れています。再ログインしてください'
+          )
+        );
+        dispatch(resetIsAuth());
+        dispatch(fetchProfEnd());
+        return;
+      }
+      if (fetchAsyncGetMyProf.fulfilled.match(result)) {
+        dispatch(fetchFolderStart());
+        await dispatch(fetchAsyncGetMyFolders());
+        dispatch(fetchFolderEnd());
+      }
       dispatch(fetchProfEnd());
     };
     if (isAuth) {
@@ -91,16 +114,7 @@ const Navbar: VFC = () => {
               </MenuBars>
             )}
 
-            <AppLogo>
-              {' '}
-              <img
-                src={logo}
-                className="App-logo"
-                alt="logo"
-                width="30"
-                height="30"
-              />
-            </AppLogo>
+            <AppLogo to="/">URLer</AppLogo>
           </TopBarLeftItems>
           {isAuth ? (
             <TopBarRightItems>
@@ -120,8 +134,10 @@ const Navbar: VFC = () => {
                 clickFunc={() => {
                   localStorage.removeItem('ajt');
                   dispatch(resetIsSetFolder());
-                  dispatch(resetMyFoldersCount());
-                  dispatch(resetFoldersCount());
+                  // dispatch(resetMyFoldersCount());
+                  // dispatch(resetFoldersCount());
+                  dispatch(setInfoMessage('ログアウトしました'));
+                  dispatch(setIsExistInfoMessage());
                   dispatch(resetIsAuth());
                 }}
                 ButtonText="ログアウト"

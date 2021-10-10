@@ -4,16 +4,18 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import {
-  Button,
-  TextField,
-  IconButton,
-  CircularProgress,
-  Switch,
-} from '@material-ui/core';
+import { Switch } from '@material-ui/core';
 import { AppDispatch } from '../../../stores/app/store';
 
-import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
+import {
+  resetIsAuth,
+  setAuthErrorMessage,
+} from '../../../stores/slices/auth/authSlice';
+
+import {
+  setInfoMessage,
+  setIsExistInfoMessage,
+} from '../../../stores/slices/message/messageSlice';
 
 import {
   selectIsLoadingFolder,
@@ -23,6 +25,9 @@ import {
   fetchAsyncUpdateFolder,
   resetOpenEditFolder,
   selectFolder,
+  selectFolderErrorMessages,
+  setFolderErrorMessage,
+  resetFolderErrorMessage,
 } from '../../../stores/slices/folder/folderSlice';
 
 import ModalWrapper from '../../atoms/Modal/ModalWrapper';
@@ -37,6 +42,7 @@ import {
   SwitchLabel,
 } from '../../atoms/Form/FormElements';
 import SubmitButton from '../../atoms/Buttons/SubmitButton';
+import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 const EditFolder: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -63,9 +69,21 @@ const EditFolder: VFC = () => {
             dispatch(fetchFolderStart());
             const result = await dispatch(fetchAsyncUpdateFolder(values));
             if (fetchAsyncUpdateFolder.rejected.match(result)) {
-              dispatch(resetIsAuth());
-              dispatch(resetOpenEditFolder());
-              return;
+              if (result.payload) {
+                if (result.payload.code === 'token_not_valid') {
+                  dispatch(
+                    setAuthErrorMessage(
+                      'アクセストークンの有効期限が切れました。再ログインしてください'
+                    )
+                  );
+                  dispatch(resetIsAuth());
+                }
+              }
+            }
+            if (fetchAsyncUpdateFolder.fulfilled.match(result)) {
+              dispatch(resetFolderErrorMessage());
+              dispatch(setInfoMessage('フォルダを作成しました'));
+              dispatch(setIsExistInfoMessage());
             }
             dispatch(fetchFolderEnd());
             dispatch(resetOpenEditFolder());
@@ -85,7 +103,11 @@ const EditFolder: VFC = () => {
             touched,
             isValid,
           }) => (
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
+            >
               <TxField
                 id="standard-basic"
                 variant="standard"
@@ -120,7 +142,9 @@ const EditFolder: VFC = () => {
               <br />
               <BottomActions>
                 <CancelButton
-                  onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
                     dispatch(resetOpenEditFolder());
                   }}
                 >
@@ -130,6 +154,7 @@ const EditFolder: VFC = () => {
                   isLoading={isLoadingFolder}
                   disabled={!isValid}
                   ButtonText="更新"
+                  clickFunc={handleSubmit}
                 />
               </BottomActions>
             </form>

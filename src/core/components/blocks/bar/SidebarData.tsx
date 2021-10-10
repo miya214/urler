@@ -11,7 +11,7 @@ import { CgProfile } from 'react-icons/cg';
 
 export const SidebarData = [
   {
-    title: 'Top',
+    title: 'MyFolder',
     path: '/',
     icon: <AiFillHome />,
   },
@@ -33,7 +33,7 @@ export const SidebarData = [
 ];
 
 export const BarDataIndex = {
-  top: 0,
+  myfolder: 0,
   mypage: 1,
   global: 2,
   favorite: 3,

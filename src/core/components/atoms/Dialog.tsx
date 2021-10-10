@@ -21,10 +21,10 @@ const CommonDialog: React.FunctionComponent<{
       <DialogContent>{msg}</DialogContent>
       <DialogActions>
         <Button onClick={() => doNo()} color="primary">
-          No
+          いいえ
         </Button>
         <Button onClick={() => doYes()} color="primary">
-          Yes
+          はい
         </Button>
       </DialogActions>
     </Dialog>

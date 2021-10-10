@@ -3,22 +3,33 @@ import { useHistory, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { selectIsAfterRegister } from '../../../../stores/slices/auth/authSlice';
+import {
+  AuthFormWrapper,
+  AuthFormHeading,
+  AuthFormBottomLink,
+  AuthFormBottomLinkWrapper,
+  AuthFormText,
+} from '../../../atoms/Form/FormElements';
 
 const SignUpAfterPage: VFC = () => {
   const isAfterRegister = useSelector(selectIsAfterRegister);
   const history = useHistory();
   useEffect(() => {
     if (!isAfterRegister) {
-      history.push('/');
+      history.replace('/');
     }
   }, [history, isAfterRegister]);
   return (
-    <div>
-      <p>メールを送信しました</p>
-      <br />
-      <p>メールに添付されたURLを開き、アカウントの有効化を行ってください</p>
-      <Link to="/login">ログイン画面に戻る</Link>
-    </div>
+    <AuthFormWrapper>
+      <AuthFormText>メールを送信しました</AuthFormText>
+
+      <AuthFormText>
+        メールに添付されたURLを開き、アカウントの有効化を行ってください。
+      </AuthFormText>
+      <AuthFormBottomLinkWrapper>
+        <AuthFormBottomLink to="/login">ログイン画面に戻る</AuthFormBottomLink>
+      </AuthFormBottomLinkWrapper>
+    </AuthFormWrapper>
   );
 };
 

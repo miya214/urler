@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 export const AuthBtn = styled.button`
@@ -24,7 +25,7 @@ export const SubmitBtn = styled(LoadingButton)`
   appearance: none;
   border: 1px solid #fff !important;
   background: rgba(121, 189, 154) !important;
-  color: white !important;
+  color: #fff !important;
   transition: 0.3s;
 
   &.Mui-disabled {
@@ -40,7 +41,7 @@ export const AuthFormBtn = styled(LoadingButton)`
   appearance: none;
   border: 1px solid #fff !important;
   background: rgba(121, 189, 154) !important;
-  color: white !important;
+  color: #fff !important;
   transition: 0.3s;
 
   display: block !important;
@@ -78,5 +79,35 @@ export const OpenModalBtn = styled.button`
   &:hover {
     cursor: pointer;
     background: #00ff00;
+  }
+`;
+
+export const OpenEditProfileBtn = styled.button`
+  appearance: none;
+  border: none;
+  border-radius: 5px;
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0.6em;
+  text-align: center;
+  color: #fff;
+  background: #79bd9a;
+  transition: 0.3s;
+  height: 50px;
+
+  &:hover {
+    cursor: pointer;
+    background: #00ff00;
+  }
+`;
+
+export const TopLinkBtn = styled(Link)`
+  text-decoration: none;
+  color: #79bd9a;
+  transition: 0.3s;
+  padding-top: 10px;
+  &:hover {
+    color: #00ff00;
   }
 `;

@@ -8,12 +8,14 @@ const SubmitButton: VFC<{
   isLoading: boolean;
   disabled: boolean;
   ButtonText: string;
-}> = ({ isLoading, disabled, ButtonText }) => (
+  clickFunc: () => void;
+}> = ({ isLoading, disabled, ButtonText, clickFunc }) => (
   <SubmitBtn
     loading={isLoading}
     disabled={disabled}
     variant="outlined"
-    type="submit"
+    type="button"
+    onClick={clickFunc}
   >
     {ButtonText}
   </SubmitBtn>

@@ -8,8 +8,18 @@ import {
   fetchCredStart,
   fetchCredEnd,
   selectIsLoadingAuth,
+  selectIsUserActive,
   fetchAsyncUserActivate,
 } from '../../../../stores/slices/auth/authSlice';
+
+import {
+  AuthFormWrapper,
+  AuthFormBottomLinkWrapper,
+  AuthFormBottomLink,
+  AuthFormText,
+} from '../../../atoms/Form/FormElements';
+
+import Loading from '../../../atoms/Loader';
 
 interface URLParams {
   uid: string;
@@ -18,6 +28,7 @@ interface URLParams {
 
 const UserActivePage: VFC = () => {
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
+  const isUserActive = useSelector(selectIsUserActive);
   const dispatch: AppDispatch = useDispatch();
   const { uid } = useParams<URLParams>();
   const { token } = useParams<URLParams>();
@@ -32,20 +43,29 @@ const UserActivePage: VFC = () => {
       };
       const resultReg = await dispatch(fetchAsyncUserActivate(data));
       if (fetchAsyncUserActivate.rejected.match(resultReg)) {
-        history.push('/');
+        history.replace('/');
       }
     };
-    userActivate().catch((e) => alert('何らかのエラーが発生しました'));
+    if (!isUserActive) {
+      userActivate().catch((e) => alert('何らかのエラーが発生しました'));
+    }
     dispatch(fetchCredEnd());
-  }, [dispatch, token, uid, history]);
+  }, [dispatch, token, uid, history, isUserActive]);
   return (
-    <div>
+    <AuthFormWrapper>
       {isLoadingAuth ? (
-        <CircularProgress />
+        <Loading />
       ) : (
-        <div>アカウントを有効にしました</div>
+        <>
+          <AuthFormText>アカウントを有効にしました</AuthFormText>{' '}
+          <AuthFormBottomLinkWrapper>
+            <AuthFormBottomLink to="/login">
+              ログイン画面に戻る
+            </AuthFormBottomLink>
+          </AuthFormBottomLinkWrapper>
+        </>
       )}
-    </div>
+    </AuthFormWrapper>
   );
 };
 

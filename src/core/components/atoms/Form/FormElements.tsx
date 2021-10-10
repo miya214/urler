@@ -1,12 +1,6 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import {
-  Button,
-  TextField,
-  IconButton,
-  CircularProgress,
-  Switch,
-} from '@mui/material';
+import { TextField } from '@mui/material';
 
 export const TxField = styled(TextField)`
   display: block !important;
@@ -115,4 +109,8 @@ export const AuthFormBottomLink = styled(Link)`
   &:hover {
     color: #00ff00;
   }
+`;
+
+export const AuthFormText = styled.p`
+  margin-bottom: 20px;
 `;

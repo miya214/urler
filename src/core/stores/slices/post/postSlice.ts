@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
+import { RESPONSE_CREATE_FOLDER_FAILURE } from '../folder/types';
 import apiURL from '../share';
 
 import {
@@ -10,6 +11,7 @@ import {
   PROPS_POST_ID,
   POST,
   POSTS,
+  RESPONSE_CREATE_POST_FAILURE,
   POST_STATE,
   PROPS_QUERY_PARAMS_GET_POSTS,
   FAVORITE_MESSAGE,
@@ -36,53 +38,133 @@ export const fetchAsyncGetPosts = createAsyncThunk(
   }
 );
 
-export const fetchAsyncCreatePost = createAsyncThunk(
-  'post/post',
-  async (post: PROPS_CREATE_POST, { rejectWithValue }) => {
-    const data = {
-      url: post.url,
-      name: post.name,
-      text: post.text,
-      folder: post.folder,
-    };
-    if (typeof localStorage.ajt === 'string') {
-      const res = await axios.post<POST>(`${apiURL}api/v1/post/`, data, {
+export const fetchAsyncCreatePost = createAsyncThunk<
+  POST,
+  PROPS_CREATE_POST,
+  { rejectValue: RESPONSE_CREATE_POST_FAILURE }
+>('post/post', async (post: PROPS_CREATE_POST, { rejectWithValue }) => {
+  const data = {
+    url: post.url,
+    name: post.name,
+    text: post.text,
+    folder: post.folder,
+  };
+  if (typeof localStorage.ajt === 'string') {
+    const res = await axios
+      .post<POST>(`${apiURL}api/v1/post/`, data, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `JWT ${localStorage.ajt}`,
         },
-      });
-      return res.data;
-    }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
-  }
-);
-
-export const fetchAsyncUpdatePost = createAsyncThunk(
-  'post/put',
-  async (post: PROPS_UPDATE_POST, { rejectWithValue }) => {
-    const data = {
-      url: post.url,
-      name: post.name,
-      text: post.text,
-      folder: post.folder,
-    };
-    if (typeof localStorage.ajt === 'string') {
-      const res = await axios.put<POST>(
-        `${apiURL}api/v1/post/${post.id}/`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `JWT ${localStorage.ajt}`,
-          },
+      })
+      .then((response) => {
+        const res_data: POST = response.data;
+        return res_data;
+      })
+      .catch((error: AxiosError<RESPONSE_CREATE_POST_FAILURE>) => {
+        if (!error.response) {
+          throw error;
         }
-      );
-      return res.data;
-    }
-    return rejectWithValue({ errorMessage: 'ログインしていません' });
+        return rejectWithValue(error.response.data);
+      });
+    return res;
   }
-);
+  return rejectWithValue({
+    url: [],
+    name: [],
+    text: [],
+    message: '',
+    auth: ['ログインまたはアカウントの作成を行ってください'],
+    code: '',
+  });
+});
+export const fetchAsyncUpdatePost = createAsyncThunk<
+  POST,
+  PROPS_UPDATE_POST,
+  { rejectValue: RESPONSE_CREATE_POST_FAILURE }
+>('post/put', async (post: PROPS_UPDATE_POST, { rejectWithValue }) => {
+  const data = {
+    url: post.url,
+    name: post.name,
+    text: post.text,
+    folder: post.folder,
+  };
+  if (typeof localStorage.ajt === 'string') {
+    const res = await axios
+      .put<POST>(`${apiURL}api/v1/post/${post.id}/`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${localStorage.ajt}`,
+        },
+      })
+      .then((response) => {
+        const res_data: POST = response.data;
+        return res_data;
+      })
+      .catch((error: AxiosError<RESPONSE_CREATE_POST_FAILURE>) => {
+        if (!error.response) {
+          throw error;
+        }
+        return rejectWithValue(error.response.data);
+      });
+    return res;
+  }
+  return rejectWithValue({
+    url: [],
+    name: [],
+    text: [],
+    message: '',
+    auth: ['ログインまたはアカウントの作成を行ってください'],
+    code: '',
+  });
+});
+// export const fetchAsyncCreatePost = createAsyncThunk(
+//   'post/post',
+//   async (post: PROPS_CREATE_POST, { rejectWithValue }) => {
+//     const data = {
+//       url: post.url,
+//       name: post.name,
+//       text: post.text,
+//       folder: post.folder,
+//     };
+//     if (typeof localStorage.ajt === 'string') {
+//       const res = await axios.post<POST>(`${apiURL}api/v1/post/`, data, {
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `JWT ${localStorage.ajt}`,
+//         },
+//       });
+//       return res.data;
+//     }
+//     return rejectWithValue({ errorMessage: 'ログインしていません' });
+//   }
+// );
+
+// export const fetchAsyncUpdatePost = createAsyncThunk(
+//   'post/put',
+//   async (post: PROPS_UPDATE_POST, { rejectWithValue }) => {
+//     const data = {
+//       url: post.url,
+//       name: post.name,
+//       text: post.text,
+//       folder: post.folder,
+//     };
+//     if (typeof localStorage.ajt === 'string') {
+//       const res = await axios.put<POST>(
+//         `${apiURL}api/v1/post/${post.id}/`,
+//         data,
+//         {
+//           headers: {
+//             'Content-Type': 'application/json',
+//             Authorization: `JWT ${localStorage.ajt}`,
+//           },
+//         }
+//       );
+//       return res.data;
+//     }
+//     return rejectWithValue({ errorMessage: 'ログインしていません' });
+//   }
+// );
 
 export const fetchAsyncDeletePost = createAsyncThunk(
   'post/delete',
@@ -102,17 +184,21 @@ export const fetchAsyncDeletePost = createAsyncThunk(
 export const fetchAsyncDeleteSelectPost = createAsyncThunk(
   'post/select/delete',
   async (id_list: string[], { rejectWithValue }) => {
+    const data = {
+      id: id_list,
+    };
     if (typeof localStorage.ajt === 'string') {
       const res = await axios.post<string>(
         `${apiURL}api/v1/postdelete/`,
-        id_list,
+        data,
         {
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `JWT ${localStorage.ajt}`,
           },
         }
       );
-      return res.data;
+      return id_list;
     }
     return rejectWithValue({ errorMessage: 'ログインしていません' });
   }
@@ -125,6 +211,7 @@ const postInitialState: POST_STATE = {
   openNewPost: false,
   openEditPost: false,
   openDeletePost: false,
+  errorMessages: [],
   posts: {
     count: 0,
     next: null,
@@ -140,15 +227,6 @@ const postInitialState: POST_STATE = {
     ],
   },
 };
-
-interface PROPS_SET_FOLDER {
-  id: string;
-  user: string;
-  name: string;
-  public: boolean;
-  posts_add: string;
-  favorite: [];
-}
 
 const postSlice = createSlice({
   name: 'post',
@@ -190,8 +268,20 @@ const postSlice = createSlice({
     resetOpenDeletePost(state) {
       state.openDeletePost = false;
     },
+    setPostErrorMessage(state, action: PayloadAction<string>) {
+      state.errorMessages = [action.payload];
+    },
+    resetPostErrorMessage(state) {
+      state.errorMessages = [];
+    },
     resetPostsCount(state) {
       state.posts.count = 0;
+    },
+    resetPosts(state) {
+      state.posts.count = 0;
+      state.posts.next = null;
+      state.posts.results = [];
+      state.isExistPosts = true;
     },
   },
   extraReducers: (builder) => {
@@ -216,14 +306,46 @@ const postSlice = createSlice({
       state.isNewPost = true;
       state.posts.results.unshift(action.payload);
     });
+    builder.addCase(fetchAsyncCreatePost.rejected, (state, action) => {
+      if (action.payload) {
+        if (action.payload.url) {
+          state.errorMessages = action.payload.url;
+        } else if (action.payload.name) {
+          state.errorMessages = action.payload.name;
+        } else if (action.payload.text) {
+          state.errorMessages = action.payload.text;
+        } else if (action.payload.message) {
+          state.errorMessages = [action.payload.message];
+        }
+      }
+    });
     builder.addCase(fetchAsyncUpdatePost.fulfilled, (state, action) => {
       state.posts.results = state.posts.results.map((post) =>
         post.id === action.payload.id ? action.payload : post
       );
     });
+    builder.addCase(fetchAsyncUpdatePost.rejected, (state, action) => {
+      if (action.payload) {
+        if (action.payload.url) {
+          state.errorMessages = action.payload.url;
+        } else if (action.payload.name) {
+          state.errorMessages = action.payload.name;
+        } else if (action.payload.text) {
+          state.errorMessages = action.payload.text;
+        } else if (action.payload.message) {
+          state.errorMessages = [action.payload.message];
+        }
+      }
+    });
     builder.addCase(fetchAsyncDeletePost.fulfilled, (state, action) => {
       state.posts.results = state.posts.results.filter(
         (post) => post.id !== action.payload
+      );
+    });
+    builder.addCase(fetchAsyncDeleteSelectPost.fulfilled, (state, action) => {
+      const id_list = action.payload;
+      state.posts.results = state.posts.results.filter(
+        (post) => id_list.includes(post.id) === false
       );
     });
   },
@@ -243,6 +365,9 @@ export const {
   resetOpenEditPost,
   setOpenDeletePost,
   resetOpenDeletePost,
+  setPostErrorMessage,
+  resetPostErrorMessage,
+  resetPosts,
 } = postSlice.actions;
 
 export const selectIsLoadingPost = (state: RootState): boolean =>
@@ -258,5 +383,7 @@ export const selectOpenNewPost = (state: RootState): boolean =>
   state.post.openNewPost;
 export const selectOpenEditPost = (state: RootState): boolean =>
   state.post.openEditPost;
+export const selectPostErrorMessages = (state: RootState): string[] =>
+  state.post.errorMessages;
 
 export default postSlice.reducer;

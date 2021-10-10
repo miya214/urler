@@ -46,6 +46,12 @@ export interface FOLDERS_WITHOUT_FAVORITE {
   results: FOLDER_WITHOUT_FAVORITE[];
 }
 
+export interface RESPONSE_CREATE_FOLDER_FAILURE {
+  name: string[] | null;
+  auth: string[] | null;
+  code: string;
+}
+
 export interface FOLDER_STATE {
   isLoadingFolder: boolean;
   isLoadingFavorite: boolean;
@@ -56,11 +62,29 @@ export interface FOLDER_STATE {
   openNewFolder: boolean;
   openEditFolder: boolean;
   openDeleteFolder: boolean;
+  numOfFavorite: number;
+  errorMessages: string[];
   folder: FOLDER;
-  myfolders: FOLDERS;
+  myfolders: FOLDER[];
+  myfoldersSearchResult: FOLDER[];
   folders: FOLDERS;
   favoritefolders: FOLDERS_WITHOUT_FAVORITE;
 }
+// export interface FOLDER_STATE {
+//   isLoadingFolder: boolean;
+//   isLoadingFavorite: boolean;
+//   isSetFolder: boolean;
+//   isExistFolders: boolean;
+//   isExistFavoriteFolders: boolean;
+//   hasMyFolder: boolean;
+//   openNewFolder: boolean;
+//   openEditFolder: boolean;
+//   openDeleteFolder: boolean;
+//   folder: FOLDER;
+//   myfolders: FOLDERS;
+//   folders: FOLDERS;
+//   favoritefolders: FOLDERS_WITHOUT_FAVORITE;
+// }
 
 export interface PROPS_QUERY_PARAMS_GET_FOLDERS {
   url: string | null;
@@ -69,7 +93,6 @@ export interface PROPS_QUERY_PARAMS_GET_FOLDERS {
 }
 
 export interface PROPS_QUERY_PARAMS_GET_MYFOLDERS {
-  url: string | null;
   search: string;
   ordering: string;
   public: string;

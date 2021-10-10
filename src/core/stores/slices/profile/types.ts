@@ -14,10 +14,16 @@ export interface PROFILE {
   created_on: string;
 }
 
+export interface RESPONSE_UPDATE_PROFILE_FAILURE {
+  nickname: string[] | null;
+  auth: string[] | null;
+  code: string;
+}
 
 export interface PROFILE_STATE {
   isLoadingProf: boolean;
   openProfile: boolean;
+  errorMessages: string[];
   myprofile: PROFILE;
   profiles: PROFILE[];
 }

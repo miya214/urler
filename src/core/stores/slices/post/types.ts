@@ -32,6 +32,15 @@ export interface POSTS {
   results: POST[];
 }
 
+export interface RESPONSE_CREATE_POST_FAILURE {
+  url: string[] | null;
+  name: string[] | null;
+  text: string[] | null;
+  message: string;
+  auth: string[] | null;
+  code: string;
+}
+
 export interface POST_STATE {
   isLoadingPost: boolean;
   isNewPost: boolean;
@@ -39,6 +48,7 @@ export interface POST_STATE {
   openNewPost: boolean;
   openEditPost: boolean;
   openDeletePost: boolean;
+  errorMessages: string[];
   posts: POSTS;
 }
 

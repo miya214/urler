@@ -11,12 +11,12 @@ const PostOrderSelect: VFC<{
 }> = ({ selectValue, changeEvent }) => (
   <Box sx={{ minWidth: 120 }}>
     <FormControl fullWidth>
-      <InputLabel id="demo-simple-select-label">Age</InputLabel>
+      <InputLabel id="demo-simple-select-label">並び替え</InputLabel>
       <Select
         labelId="demo-simple-select-label"
         id="demo-simple-select"
         value={selectValue}
-        label="Age"
+        label="order"
         onChange={changeEvent}
       >
         <MenuItem value="name">50音順</MenuItem>

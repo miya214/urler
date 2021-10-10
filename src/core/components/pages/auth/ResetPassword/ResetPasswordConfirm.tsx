@@ -11,6 +11,8 @@ import {
   fetchCredEnd,
   selectIsLoadingAuth,
   fetchAsyncResetPasswordConfirm,
+  selectAuthErrorMessage,
+  resetAuthErrorMessage,
 } from '../../../../stores/slices/auth/authSlice';
 
 import {
@@ -24,6 +26,7 @@ import {
 
 import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
 import Loading from '../../../atoms/Loader';
+import ErrorAlert from '../../../atoms/Alert/ErrorAlert';
 
 interface URLParams {
   uid: string;
@@ -34,6 +37,7 @@ const ResetPasswordCofirmPage: VFC = () => {
   const isLoadingAuth = useSelector(selectIsLoadingAuth);
   const dispatch: AppDispatch = useDispatch();
   const history = useHistory();
+  const authErrorMessages = useSelector(selectAuthErrorMessage);
   const { uid } = useParams<URLParams>();
   const { token } = useParams<URLParams>();
   return (
@@ -47,10 +51,8 @@ const ResetPasswordCofirmPage: VFC = () => {
         );
 
         if (fetchAsyncResetPasswordConfirm.fulfilled.match(resultReg)) {
-          history.push('/login');
-        }
-        if (fetchAsyncResetPasswordConfirm.rejected.match(resultReg)) {
-          alert('無効なURLです');
+          dispatch(resetAuthErrorMessage());
+          history.replace('/login');
         }
         dispatch(fetchCredEnd());
       }}
@@ -74,6 +76,9 @@ const ResetPasswordCofirmPage: VFC = () => {
         isValid,
       }) => (
         <AuthFormWrapper>
+          {authErrorMessages.map((message) => (
+            <ErrorAlert text={message} />
+          ))}
           <form onSubmit={handleSubmit}>
             <div>
               <AuthFormHeading>パスワードリセット</AuthFormHeading>
