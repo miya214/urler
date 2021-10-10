@@ -14,6 +14,7 @@ import { PrivateRouteProps } from './types';
 const PrivateRoute: VFC<PrivateRouteProps> = ({ children, ...rest }) => {
   const location = useLocation();
   const isAuth = useSelector(selectIsAuth);
+  console.log(location);
 
   return (
     <Route
