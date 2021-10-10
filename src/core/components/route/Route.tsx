@@ -1,5 +1,5 @@
 import { VFC } from 'react';
-import { BrowserRouter as Router, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, HashRouter } from 'react-router-dom';
 
 import '../../App.css';
 
@@ -29,7 +29,7 @@ import ScrollToTop from './ScrollToTop';
 import { MainElems } from './RouteElements';
 
 const RouteComponent: VFC = () => (
-  <Router basename="/urler">
+  <HashRouter basename="/urler">
     <ScrollToTop />
     <Sidebar />
     <Navbar />
@@ -77,7 +77,7 @@ const RouteComponent: VFC = () => (
       </Switch>
     </MainElems>
     <InfoAlert />
-  </Router>
+  </HashRouter>
 );
 
 export default RouteComponent;
