@@ -29,7 +29,7 @@ import ScrollToTop from './ScrollToTop';
 import { MainElems } from './RouteElements';
 
 const RouteComponent: VFC = () => (
-  <Router basename={process.env.PUBLIC_URL}>
+  <Router>
     <ScrollToTop />
     <Sidebar />
     <Navbar />
