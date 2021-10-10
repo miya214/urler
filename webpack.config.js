@@ -2,6 +2,7 @@ module.exports = {
   // モード値を production に設定すると最適化された状態で、
   // development に設定するとソースマップ有効でJSファイルが出力される
   entry: `${__dirname}/src/index.tsx`,
+  mode: 'development',
   // ファイルの出力設定
   output: {
     //  出力ファイルのディレクトリ名
@@ -18,6 +19,7 @@ module.exports = {
         test: /\.(sass|less|css|tsx?)$/,
         // TypeScript をコンパイルする
         use: 'ts-loader',
+        exclude: /node_modules/,
       },
     ],
   },
