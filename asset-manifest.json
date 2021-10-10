@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "https://miya214.github.io/urler/static/css/main.2a86dbe7.chunk.css",
-    "main.js": "https://miya214.github.io/urler/static/js/main.398107ef.chunk.js",
-    "main.js.map": "https://miya214.github.io/urler/static/js/main.398107ef.chunk.js.map",
+    "main.js": "https://miya214.github.io/urler/static/js/main.b5cac69b.chunk.js",
+    "main.js.map": "https://miya214.github.io/urler/static/js/main.b5cac69b.chunk.js.map",
     "runtime-main.js": "https://miya214.github.io/urler/static/js/runtime-main.7f99dbed.js",
     "runtime-main.js.map": "https://miya214.github.io/urler/static/js/runtime-main.7f99dbed.js.map",
     "static/js/2.d9635fa8.chunk.js": "https://miya214.github.io/urler/static/js/2.d9635fa8.chunk.js",
@@ -15,6 +15,6 @@
     "static/js/runtime-main.7f99dbed.js",
     "static/js/2.d9635fa8.chunk.js",
     "static/css/main.2a86dbe7.chunk.css",
-    "static/js/main.398107ef.chunk.js"
+    "static/js/main.b5cac69b.chunk.js"
   ]
 }
