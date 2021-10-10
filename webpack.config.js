@@ -1,3 +1,7 @@
+const path = require('path');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
   // モード値を production に設定すると最適化された状態で、
   // development に設定するとソースマップ有効でJSファイルが出力される
@@ -50,4 +54,10 @@ module.exports = {
       rewrites: [{ from: /\//, to: '/404.html' }],
     },
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      filename: 'index.html',
+    }),
+  ],
 };
