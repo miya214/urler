@@ -145,10 +145,10 @@ const Navbar: VFC = () => {
             </TopBarRightItems>
           ) : (
             <TopBarRightItems>
-              <SignInLink to="/signup">新規登録</SignInLink>
+              <SignInLink to="signup">新規登録</SignInLink>
               <AuthButton
                 clickFunc={() => {
-                  history.push('/login');
+                  history.push('login');
                 }}
                 ButtonText="ログイン"
               />
