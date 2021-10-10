@@ -29,7 +29,7 @@ import ScrollToTop from './ScrollToTop';
 import { MainElems } from './RouteElements';
 
 const RouteComponent: VFC = () => (
-  <Router basename="/urler">
+  <HashRouter basename="/">
     <ScrollToTop />
     <Sidebar />
     <Navbar />
@@ -77,7 +77,7 @@ const RouteComponent: VFC = () => (
       </Switch>
     </MainElems>
     <InfoAlert />
-  </Router>
+  </HashRouter>
 );
 
 export default RouteComponent;
