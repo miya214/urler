@@ -56,6 +56,7 @@ const LoginPage: VFC = () => {
           dispatch(resetAuthErrorMessage());
           dispatch(setInfoMessage('ログインしました'));
           dispatch(setIsExistInfoMessage());
+          dispatch(fetchCredEnd());
           history.replace(state.from ?? '/');
         }
         dispatch(fetchCredEnd());
