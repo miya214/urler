@@ -1,17 +1,18 @@
-import { VFC, MouseEvent, ReactElement } from 'react';
+import { VFC, ReactElement } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import { selectActiveIndex } from '../../../stores/slices/bar/barSlice';
+
 import {
   MainHeaderItemWrapper,
   MainHeaderLeftItems,
   MainHeaderTitle,
 } from './MainElements';
 
-import { selectActiveIndex } from '../../../stores/slices/bar/barSlice';
-
-import { OpenModalBtn } from '../../atoms/Buttons/ButtonDesign';
 import { SidebarData } from '../bar/SidebarData';
 
 const MainHeader: VFC<{

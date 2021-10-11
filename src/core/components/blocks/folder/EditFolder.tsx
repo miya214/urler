@@ -1,10 +1,10 @@
-import { VFC, useState } from 'react';
-import Modal from 'react-modal';
-import { useLocation, useHistory } from 'react-router-dom';
+import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+
 import { Switch } from '@material-ui/core';
+
 import { AppDispatch } from '../../../stores/app/store';
 
 import {
@@ -25,8 +25,6 @@ import {
   fetchAsyncUpdateFolder,
   resetOpenEditFolder,
   selectFolder,
-  selectFolderErrorMessages,
-  setFolderErrorMessage,
   resetFolderErrorMessage,
 } from '../../../stores/slices/folder/folderSlice';
 
@@ -41,8 +39,8 @@ import {
   SwitchSelect,
   SwitchLabel,
 } from '../../atoms/Form/FormElements';
+
 import SubmitButton from '../../atoms/Buttons/SubmitButton';
-import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 const EditFolder: VFC = () => {
   const dispatch: AppDispatch = useDispatch();

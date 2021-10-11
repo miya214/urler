@@ -1,6 +1,5 @@
 import { VFC, useEffect } from 'react';
 import './App.css';
-
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch } from './stores/app/store';
 import RouteComponent from './components/route/Route';

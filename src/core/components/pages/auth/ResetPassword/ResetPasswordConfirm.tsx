@@ -1,9 +1,9 @@
 import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory, useParams } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useHistory, useParams, Link } from 'react-router-dom';
-import { TextField, Button, CircularProgress } from '@material-ui/core';
+
 import { AppDispatch } from '../../../../stores/app/store';
 
 import {
@@ -23,7 +23,6 @@ import {
   ErrorMessage,
   LoaderWrapper,
 } from '../../../atoms/Form/FormElements';
-
 import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
 import Loading from '../../../atoms/Loader';
 import ErrorAlert from '../../../atoms/Alert/ErrorAlert';
@@ -77,7 +76,7 @@ const ResetPasswordCofirmPage: VFC = () => {
       }) => (
         <AuthFormWrapper>
           {authErrorMessages.map((message) => (
-            <ErrorAlert text={message} />
+            <ErrorAlert text={message} key={message} />
           ))}
           <form onSubmit={handleSubmit}>
             <div>

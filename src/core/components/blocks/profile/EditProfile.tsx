@@ -1,13 +1,8 @@
-import { VFC, useState } from 'react';
+import { VFC } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import Box from '@mui/material/Box';
-import { Button, TextField, IconButton, CircularProgress } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
 
-import { useLocation, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../stores/app/store';
 
 import {
@@ -20,15 +15,12 @@ import {
   selectMyProfile,
   selectOpenProfile,
   resetOpenProfile,
-  fetchProfStart,
-  fetchProfEnd,
   fetchAsyncUpdateProf,
   editNickname,
   selectProfileErrorMessages,
   resetProfileErrorMessage,
 } from '../../../stores/slices/profile/profileSlice';
 
-import ModalWrapper from '../../atoms/Modal/ModalWrapper';
 import {
   TxField,
   ErrorMessage,
@@ -41,12 +33,12 @@ import {
   setIsExistInfoMessage,
 } from '../../../stores/slices/message/messageSlice';
 
+import ModalWrapper from '../../atoms/Modal/ModalWrapper';
 import SubmitButton from '../../atoms/Buttons/SubmitButton';
 import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 const EditProfile: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const history = useHistory();
   const isLoadingProf = useSelector(selectIsLoadingProf);
   const openProfile = useSelector(selectOpenProfile);
   const profile = useSelector(selectMyProfile);
@@ -101,7 +93,7 @@ const EditProfile: VFC = () => {
           }) => (
             <>
               {profileErrorMessages.map((message) => (
-                <ErrorAlert text={message} />
+                <ErrorAlert text={message} key={message} />
               ))}
               <form
                 onSubmit={(e) => {

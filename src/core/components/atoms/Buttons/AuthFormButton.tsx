@@ -1,7 +1,5 @@
-import { VFC, MouseEvent } from 'react';
-import LoadingButton from '@mui/lab/LoadingButton';
-import SaveIcon from '@mui/icons-material/Save';
-import Stack from '@mui/material/Stack';
+import { VFC } from 'react';
+
 import { AuthFormBtn } from './ButtonDesign';
 
 const AuthFormButton: VFC<{

@@ -1,24 +1,14 @@
-import { VFC, useEffect, useCallback, useState, FormEvent } from 'react';
+import { VFC, useState, FormEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
-import { CircularProgress } from '@material-ui/core';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { AppDispatch } from '../../../stores/app/store';
 
-import {
-  resetIsAuth,
-  setAuthErrorMessage,
-} from '../../../stores/slices/auth/authSlice';
+import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
 
-import {
-  setInfoMessage,
-  setIsExistInfoMessage,
-} from '../../../stores/slices/message/messageSlice';
 import { selectFolder } from '../../../stores/slices/folder/folderSlice';
 
 import { selectMyProfile } from '../../../stores/slices/profile/profileSlice';
@@ -50,22 +40,15 @@ import {
 } from '../main/MainElements';
 
 import SearchBox from '../../atoms/Input/SearchBox';
-import OrderSelect from '../../atoms/OrderSelect';
 import PostOrderSelect from '../../atoms/PostOrderSelect';
+import Loading from '../../atoms/Loader';
+import SearchButton from '../../atoms/Buttons/SearchButton';
 
 import NewPost from './NewPost';
 import EditPost from './EditPost';
-
-import Loading from '../../atoms/Loader';
-import MainHeader from '../main/MainHeader';
-import { OpenModalBtn } from '../../atoms/Buttons/ButtonDesign';
-
-import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
-
-import SearchButton from '../../atoms/Buttons/SearchButton';
-
 import PostListItem from './PostsListItem';
 import useMultiplePostChecked from './CheckPost';
+
 import {
   PostListItemWithCheckBox,
   WCPostListItem,
@@ -97,10 +80,11 @@ const Posts: VFC = () => {
 
   const [checkBoxToggle, setCheckBoxToggle] = useState<boolean>(false);
 
-  const { checked, toggleChecked, allCheck, clearCheck } =
-    useMultiplePostChecked(posts.results.map((post) => post.id));
+  const { checked, toggleChecked, clearCheck } = useMultiplePostChecked(
+    posts.results.map((post) => post.id)
+  );
 
-  const loadMore = async (page: number) => {
+  const loadMore = async () => {
     dispatch(resetIsNewPost());
     if (!folder.id) {
       return;
@@ -200,7 +184,7 @@ const Posts: VFC = () => {
   const postListOthers = (
     <ul>
       {posts.results.map((post) => (
-        <PostListItem post={post} />
+        <PostListItem post={post} key={post.id} />
       ))}
     </ul>
   );
@@ -248,6 +232,7 @@ const Posts: VFC = () => {
                 type="button"
                 aria-label="edit-post"
                 onClick={() => {
+                  clearCheck();
                   setCheckBoxToggle(!checkBoxToggle);
                 }}
               >
@@ -264,17 +249,6 @@ const Posts: VFC = () => {
               >
                 作成
               </PostCreateButton>
-              {/* <PostCreateIconButton
-                type="button"
-                aria-label="edit-post"
-                color="primary"
-                onClick={() => {
-                  dispatch(setOpenNewPost());
-                }}
-                className={!checkBoxToggle ? 'active' : ''}
-              >
-                <AddBoxOutlinedIcon />
-              </PostCreateIconButton> */}
 
               <PostSelectDeleteButton
                 type="button"
@@ -313,24 +287,6 @@ const Posts: VFC = () => {
             </LoadingWrapper>
           )}
         </FolderSection>
-
-        {/* {!isLoadingPost ? (
-          isExistPosts ? (
-            <InfiniteScroll
-              loadMore={loadMore}
-              hasMore={hasMore}
-              loader={loader}
-            >
-              {postsList}
-            </InfiniteScroll>
-          ) : isNewPost ? (
-            <div>{postsList}</div>
-          ) : (
-            <h1>有りません</h1>
-          )
-        ) : (
-          <CircularProgress />
-        )} */}
       </MainBody>
     </>
   );

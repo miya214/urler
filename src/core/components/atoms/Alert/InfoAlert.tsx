@@ -1,10 +1,11 @@
-import { VFC, useState, SyntheticEvent, MouseEvent } from 'react';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
+import { VFC, SyntheticEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+
+import { Snackbar, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+
 import { AppDispatch } from '../../../stores/app/store';
+
 import {
   selectInfoMessage,
   selectIsExistMessage,

@@ -1,4 +1,4 @@
-import { VFC, MouseEvent } from 'react';
+import { VFC } from 'react';
 
 import { SearchBtn } from './ButtonDesign';
 

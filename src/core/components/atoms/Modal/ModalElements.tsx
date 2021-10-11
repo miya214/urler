@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Modal, Box } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 
 const ModalBox = styled(Box)`
   position: absolute;

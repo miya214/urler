@@ -1,10 +1,19 @@
 import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useHistory, Link } from 'react-router-dom';
-import { TextField, Button, CircularProgress } from '@material-ui/core';
+
 import { AppDispatch } from '../../../../stores/app/store';
+
+import {
+  fetchCredStart,
+  fetchCredEnd,
+  selectIsLoadingAuth,
+  fetchAsyncRegister,
+  selectAuthErrorMessage,
+  resetAuthErrorMessage,
+} from '../../../../stores/slices/auth/authSlice';
 
 import {
   AuthFormWrapper,
@@ -15,19 +24,9 @@ import {
   AuthFormBottomLink,
   AuthFormBottomLinkWrapper,
 } from '../../../atoms/Form/FormElements';
-
 import AuthFormButton from '../../../atoms/Buttons/AuthFormButton';
 import Loading from '../../../atoms/Loader';
 import ErrorAlert from '../../../atoms/Alert/ErrorAlert';
-
-import {
-  fetchCredStart,
-  fetchCredEnd,
-  selectIsLoadingAuth,
-  fetchAsyncRegister,
-  selectAuthErrorMessage,
-  resetAuthErrorMessage,
-} from '../../../../stores/slices/auth/authSlice';
 
 const SignUpPage: VFC = () => {
   const isLoadingAuth = useSelector(selectIsLoadingAuth);

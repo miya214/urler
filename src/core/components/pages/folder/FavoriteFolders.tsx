@@ -1,10 +1,11 @@
-import { VFC, useEffect, useCallback, useState, FormEvent } from 'react';
+import { VFC, useEffect, useState, FormEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
-import { CircularProgress } from '@material-ui/core';
+
 import Divider from '@mui/material/Divider';
+
 import { AppDispatch } from '../../../stores/app/store';
+
 import {
   resetIsAuth,
   setAuthErrorMessage,
@@ -24,12 +25,15 @@ import {
   resetFavoriteFoldersCount,
 } from '../../../stores/slices/folder/folderSlice';
 
-import SearchBox from '../../atoms/Input/SearchBox';
-import OrderSelect from '../../atoms/OrderSelect';
-import FavoriteFolderOrderSelect from '../../atoms/FavoriteFolerOrderSelect';
 import { resetPosts } from '../../../stores/slices/post/postSlice';
 
 import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
+
+import SearchBox from '../../atoms/Input/SearchBox';
+import FavoriteFolderOrderSelect from '../../atoms/FavoriteFolerOrderSelect';
+import SearchButton from '../../atoms/Buttons/SearchButton';
+import Loading from '../../atoms/Loader';
+import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
 
 import {
   MainBody,
@@ -43,11 +47,7 @@ import {
 import FolderList from '../../blocks/folder/FolderList';
 import FolderListItem from '../../blocks/folder/FolderListItem';
 import { FolderItemLink } from '../../blocks/folder/FolderElements';
-import SearchButton from '../../atoms/Buttons/SearchButton';
-import Loading from '../../atoms/Loader';
 import MainHeader from '../../blocks/main/MainHeader';
-
-import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
 
 const FavoriteFoldersPage: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -65,7 +65,7 @@ const FavoriteFoldersPage: VFC = () => {
     dispatch(setActiveIndex(3));
   }, [dispatch]);
 
-  const loadMore = async (page: number) => {
+  const loadMore = async () => {
     const nextUrl = folders.next;
     if (!nextUrl && folders.count !== 0) {
       setHasMore(false);

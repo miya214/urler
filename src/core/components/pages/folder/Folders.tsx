@@ -1,26 +1,22 @@
-import { VFC, useEffect, useCallback, useState, FormEvent } from 'react';
+import { VFC, useEffect, useState, FormEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
+
 import Divider from '@mui/material/Divider';
-import { CircularProgress } from '@material-ui/core';
+
 import { AppDispatch } from '../../../stores/app/store';
+
 import {
   resetIsAuth,
   setAuthErrorMessage,
 } from '../../../stores/slices/auth/authSlice';
 
 import {
-  selectMyFolders,
   selectFolders,
   selectIsLoadingFolder,
-  selectIsSetFolder,
-  selectHasMyFolder,
   selectIsExistFolders,
-  setOpenNewFolder,
   fetchFolderStart,
   fetchFolderEnd,
-  fetchAsyncGetMyFolders,
   fetchAsyncGetFolders,
   setFolder,
   setIsExistFolders,
@@ -33,6 +29,9 @@ import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
 
 import SearchBox from '../../atoms/Input/SearchBox';
 import OrderSelect from '../../atoms/OrderSelect';
+import SearchButton from '../../atoms/Buttons/SearchButton';
+import Loading from '../../atoms/Loader';
+import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
 
 import {
   MainBody,
@@ -43,15 +42,11 @@ import {
   NotFoundText,
   LoadingWrapper,
 } from '../../blocks/main/MainElements';
+
 import FolderList from '../../blocks/folder/FolderList';
 import FolderListItem from '../../blocks/folder/FolderListItem';
 import { FolderItemLink } from '../../blocks/folder/FolderElements';
-import SearchButton from '../../atoms/Buttons/SearchButton';
-import Loading from '../../atoms/Loader';
 import MainHeader from '../../blocks/main/MainHeader';
-import { OpenModalBtn } from '../../atoms/Buttons/ButtonDesign';
-
-import TopLinkButton from '../../atoms/Buttons/TopLinkButton';
 
 const FoldersPage: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -68,7 +63,7 @@ const FoldersPage: VFC = () => {
     dispatch(setActiveIndex(2));
   }, [dispatch]);
 
-  const loadMore = async (page: number) => {
+  const loadMore = async () => {
     const nextUrl = folders.next;
     if (!nextUrl && folders.count !== 0) {
       setHasMore(false);

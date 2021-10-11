@@ -1,24 +1,15 @@
 import { VFC } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Redirect,
-  useLocation,
-  RouteProps,
-} from 'react-router-dom';
+import { Route, Redirect, RouteProps } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { selectIsAuth } from '../../stores/slices/auth/authSlice';
 
-import { LOCATION_FROM_PROPS } from './types';
-
 const UnAuthRoute: VFC<RouteProps> = ({ ...props }) => {
   const isAuth = useSelector(selectIsAuth);
-  const { state } = useLocation<LOCATION_FROM_PROPS>();
-
+  const location = sessionStorage.getItem('location');
   if (isAuth) {
-    if (state) {
-      return <Redirect to={state.from} />;
+    if (location) {
+      return <Redirect to={location} />;
     }
     return <Redirect to="/" />;
   }

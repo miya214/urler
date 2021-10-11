@@ -1,10 +1,10 @@
-import { VFC, useState } from 'react';
-import Modal from 'react-modal';
-import { useLocation, useHistory } from 'react-router-dom';
+import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+
 import { Switch } from '@material-ui/core';
+
 import { AppDispatch } from '../../../stores/app/store';
 
 import {
@@ -25,7 +25,6 @@ import {
   fetchAsyncCreateFolder,
   resetOpenNewFolder,
   selectFolderErrorMessages,
-  setFolderErrorMessage,
   resetFolderErrorMessage,
 } from '../../../stores/slices/folder/folderSlice';
 
@@ -45,7 +44,6 @@ import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 const NewFolder: VFC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const history = useHistory();
   const isLoadingFolder = useSelector(selectIsLoadingFolder);
   const openNewFolder = useSelector(selectOpenNewFolder);
   const folderErrorMessages = useSelector(selectFolderErrorMessages);
@@ -104,7 +102,7 @@ const NewFolder: VFC = () => {
           }) => (
             <>
               {folderErrorMessages.map((message) => (
-                <ErrorAlert text={message} />
+                <ErrorAlert text={message} key={message} />
               ))}
               <form
                 onSubmit={(e) => {

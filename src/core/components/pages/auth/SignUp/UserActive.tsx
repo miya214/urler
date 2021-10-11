@@ -1,7 +1,7 @@
 import { VFC, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { CircularProgress } from '@material-ui/core';
+
 import { AppDispatch } from '../../../../stores/app/store';
 
 import {
@@ -47,7 +47,7 @@ const UserActivePage: VFC = () => {
       }
     };
     if (!isUserActive) {
-      userActivate().catch((e) => alert('何らかのエラーが発生しました'));
+      userActivate().catch((e) => console.log(e));
     }
     dispatch(fetchCredEnd());
   }, [dispatch, token, uid, history, isUserActive]);

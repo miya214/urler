@@ -1,8 +1,10 @@
 import { VFC } from 'react';
+
 import { red } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+
 import FavoriteButton from '../../atoms/Buttons/FavoriteButton';
 import {
   FolderDetailInfoWrapper,

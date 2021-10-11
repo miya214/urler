@@ -1,4 +1,4 @@
-import { VFC, useEffect } from 'react';
+import { VFC } from 'react';
 import { useSelector } from 'react-redux';
 
 import { selectIsExistMessage } from '../../../stores/slices/message/messageSlice';

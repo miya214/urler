@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { TextField, RadioGroup, FormLabel } from '@material-ui/core';
+
+import { TextField, RadioGroup } from '@material-ui/core';
 
 export const SearchField = styled(TextField)`
   width: 100%;

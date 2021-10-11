@@ -1,11 +1,8 @@
 import { VFC } from 'react';
+
 import FolderIcon from '@mui/icons-material/Folder';
-import Avatar from '@mui/material/Avatar';
-import ListItem from '@mui/material/ListItem';
+
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 
 import { FListItem, FListItemText, FolderAvatar } from './FolderElements';
 

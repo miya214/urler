@@ -1,12 +1,5 @@
-import { VFC } from 'react';
-import { FaBars } from 'react-icons/fa';
-import {
-  AiFillHome,
-  AiOutlineClose,
-  AiOutlineGlobal,
-  AiFillStar,
-} from 'react-icons/ai';
-import { RiGlobalFill } from 'react-icons/ri';
+import { AiFillHome, AiOutlineGlobal, AiFillStar } from 'react-icons/ai';
+
 import { CgProfile } from 'react-icons/cg';
 
 export const SidebarData = [

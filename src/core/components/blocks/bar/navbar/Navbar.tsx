@@ -1,10 +1,11 @@
 import { VFC, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+
 import { IconContext } from 'react-icons';
 import { FaBars } from 'react-icons/fa';
 import { AiOutlineClose } from 'react-icons/ai';
-import { CgProfile } from 'react-icons/cg';
+
 import { AppDispatch } from '../../../../stores/app/store';
 
 import {
@@ -20,8 +21,6 @@ import {
 
 import {
   resetIsSetFolder,
-  resetFoldersCount,
-  resetMyFoldersCount,
   fetchFolderStart,
   fetchFolderEnd,
   fetchAsyncGetMyFolders,
@@ -32,12 +31,10 @@ import {
   fetchProfEnd,
   fetchAsyncGetMyProf,
   selectMyProfile,
-  resetProfile,
 } from '../../../../stores/slices/profile/profileSlice';
 
 import {
   setActiveIndex,
-  resetActiveIndex,
   selectActiveIndex,
 } from '../../../../stores/slices/bar/barSlice';
 
@@ -51,7 +48,6 @@ import {
   TopBarProfile,
   TopBarProfileIconLink,
   SignInLink,
-  Button,
   NavMenu,
   NavMenuItems,
   NavBarToggle,
@@ -59,7 +55,6 @@ import {
   NavLink,
   ProfileIcon,
 } from './NavbarElements';
-import logo from '../../../../../logo.svg';
 
 import AuthButton from '../../../atoms/Buttons/AuthButtonSub';
 
@@ -182,38 +177,6 @@ const Navbar: VFC = () => {
           )}
         </NavBarWrapper>
       </IconContext.Provider>
-      {/* <Nav>
-        <NavLink to="/">
-          <h1>UMA</h1>
-        </NavLink>
-        <Bars />
-        <NavMenu>
-          <NavLink to="/signup">新規登録</NavLink>
-        </NavMenu>
-        <NavMenu>
-          <NavLink to="/folder">フォルダ</NavLink>
-        </NavMenu>
-        <NavMenu>
-          <NavLink to="/folder/favorite">お気に入りフォルダ</NavLink>
-        </NavMenu>
-        <NavBtn>
-          <NavBtnLink to="/login">ログイン</NavBtnLink>
-        </NavBtn>
-        <NavBtn />
-        <button
-          type="button"
-          onClick={() => {
-            localStorage.removeItem('ajt');
-            dispatch(resetIsAuth());
-            dispatch(resetIsSetFolder());
-            dispatch(resetMyFoldersCount());
-            dispatch(resetFoldersCount());
-            history.push('/login');
-          }}
-        >
-          ログアウト
-        </button>
-      </Nav> */}
     </>
   );
 };

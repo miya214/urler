@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 
 const bgColor = '#fdfdfd';
 const borderColor = '#f9f9f9';
-const iconColor = 'black';
-const txColor = 'black';
 const mainColor = '#00ff00';
 
 export const SideMenu = styled.div`

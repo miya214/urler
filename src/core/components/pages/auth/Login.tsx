@@ -1,23 +1,10 @@
 import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useHistory, useLocation, Link } from 'react-router-dom';
-import { AppDispatch } from '../../../stores/app/store';
-import {
-  AuthFormWrapper,
-  AuthFormHeading,
-  TxField,
-  ErrorMessage,
-  LoaderWrapper,
-  AuthFormBottomLink,
-  AuthFormBottomLinkWrapper,
-} from '../../atoms/Form/FormElements';
 
-import AuthFormButton from '../../atoms/Buttons/AuthFormButton';
-import Loading from '../../atoms/Loader';
-import ErrorAlert from '../../atoms/Alert/ErrorAlert';
-import InfoAlert from '../../atoms/Alert/InfoAlert';
+import { AppDispatch } from '../../../stores/app/store';
 
 import {
   fetchCredStart,
@@ -32,6 +19,20 @@ import {
   setInfoMessage,
   setIsExistInfoMessage,
 } from '../../../stores/slices/message/messageSlice';
+
+import {
+  AuthFormWrapper,
+  AuthFormHeading,
+  TxField,
+  ErrorMessage,
+  LoaderWrapper,
+  AuthFormBottomLink,
+  AuthFormBottomLinkWrapper,
+} from '../../atoms/Form/FormElements';
+
+import AuthFormButton from '../../atoms/Buttons/AuthFormButton';
+import Loading from '../../atoms/Loader';
+import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
 export interface LOCATION_FROM_PROPS {
   from: string;
@@ -77,7 +78,7 @@ const LoginPage: VFC = () => {
       }) => (
         <AuthFormWrapper>
           {authErrorMessages.map((message) => (
-            <ErrorAlert text={message} />
+            <ErrorAlert text={message} key={message} />
           ))}
           <form onSubmit={handleSubmit}>
             <div>

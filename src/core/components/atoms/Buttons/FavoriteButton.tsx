@@ -1,17 +1,19 @@
-import { VFC, useEffect, useState, MouseEvent } from 'react';
-import { CircularProgress, Icon, IconButton } from '@material-ui/core';
-import { lightBlue, amber } from '@mui/material/colors';
+import { VFC, useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { IconButton } from '@material-ui/core';
+import { amber } from '@mui/material/colors';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { useSelector, useDispatch } from 'react-redux';
+
 import { AppDispatch } from '../../../stores/app/store';
-import { selectMyProfile } from '../../../stores/slices/profile/profileSlice';
-import Loading from '../Loader';
 
 import {
   resetIsAuth,
   setAuthErrorMessage,
 } from '../../../stores/slices/auth/authSlice';
+
+import { selectMyProfile } from '../../../stores/slices/profile/profileSlice';
 
 import {
   selectIsLoadingFavorite,
@@ -25,6 +27,8 @@ import {
   setIsExistInfoMessage,
   resetIsExistInfoMessage,
 } from '../../../stores/slices/message/messageSlice';
+
+import Loading from '../Loader';
 
 const FavoriteButton: VFC<{
   id: string;

@@ -1,42 +1,34 @@
-import { VFC, useEffect, useCallback, useState, FormEvent } from 'react';
+import { VFC, useEffect, useState, FormEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
-import InfiniteScroll from 'react-infinite-scroller';
-import { CircularProgress } from '@material-ui/core';
+
 import Divider from '@mui/material/Divider';
+
 import { AppDispatch } from '../../../stores/app/store';
 import NewFolder from '../../blocks/folder/NewFolder';
-import { resetIsAuth } from '../../../stores/slices/auth/authSlice';
 
 import {
-  selectMyFolders,
-  selectFolders,
   selectIsLoadingFolder,
-  selectIsSetFolder,
   selectHasMyFolder,
   setOpenNewFolder,
   fetchFolderStart,
   fetchFolderEnd,
-  fetchAsyncGetMyFolders,
-  fetchAsyncGetFolders,
   setFolder,
   setHasMyFolder,
-  resetMyFoldersCount,
   selectMyFoldersSearchResult,
   searchMyFolders,
 } from '../../../stores/slices/folder/folderSlice';
-import {
-  resetPostsCount,
-  setIsExistPosts,
-  resetPosts,
-} from '../../../stores/slices/post/postSlice';
+
+import { resetPosts } from '../../../stores/slices/post/postSlice';
 
 import { setActiveIndex } from '../../../stores/slices/bar/barSlice';
 
 import SearchBox from '../../atoms/Input/SearchBox';
 import PublicSelect from '../../atoms/Input/PublicSelect';
-import OrderSelect from '../../atoms/OrderSelect';
 import TopOrderSelect from '../../atoms/TopOrderSelect';
+import SearchButton from '../../atoms/Buttons/SearchButton';
+import Loading from '../../atoms/Loader';
+import { OpenModalBtn } from '../../atoms/Buttons/ButtonDesign';
+
 import {
   MainBody,
   FolderSection,
@@ -46,13 +38,11 @@ import {
   NotFoundText,
   LoadingWrapper,
 } from '../../blocks/main/MainElements';
+
 import FolderList from '../../blocks/folder/FolderList';
 import FolderListItem from '../../blocks/folder/FolderListItem';
 import { FolderItemLink } from '../../blocks/folder/FolderElements';
-import SearchButton from '../../atoms/Buttons/SearchButton';
-import Loading from '../../atoms/Loader';
 import MainHeader from '../../blocks/main/MainHeader';
-import { OpenModalBtn } from '../../atoms/Buttons/ButtonDesign';
 
 const MyFoldersPage: VFC = () => {
   const hasMyFolder = useSelector(selectHasMyFolder);
@@ -61,10 +51,8 @@ const MyFoldersPage: VFC = () => {
   const [searchText, setSearchText] = useState<string>('');
   const [orderingText, setOrderingText] = useState<string>('');
   const [Public, setPublic] = useState<string>('');
-  const isSetfolder = useSelector(selectIsSetFolder);
   const myfoldersSearchResult = useSelector(selectMyFoldersSearchResult);
   const isLoadingFolder = useSelector(selectIsLoadingFolder);
-  const myfolders = useSelector(selectMyFolders);
 
   useEffect(() => {
     dispatch(setActiveIndex(0));

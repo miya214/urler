@@ -1,19 +1,13 @@
-import { VFC, useState } from 'react';
+import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, Link } from 'react-router-dom';
 import { IconContext } from 'react-icons';
-import { FaBars } from 'react-icons/fa';
-import { AiOutlineClose } from 'react-icons/ai';
+
 import { AppDispatch } from '../../../../stores/app/store';
 
-import {
-  selectIsAuth,
-  resetIsAuth,
-} from '../../../../stores/slices/auth/authSlice';
+import { selectIsAuth } from '../../../../stores/slices/auth/authSlice';
 
 import {
   setActiveIndex,
-  resetActiveIndex,
   selectActiveIndex,
 } from '../../../../stores/slices/bar/barSlice';
 

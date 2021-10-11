@@ -1,6 +1,5 @@
-import { VFC, useState } from 'react';
-import Modal from 'react-modal';
-import { useLocation, useHistory } from 'react-router-dom';
+import { VFC } from 'react';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -26,7 +25,6 @@ import {
   fetchPostEnd,
   fetchAsyncCreatePost,
   resetOpenNewPost,
-  setPostErrorMessage,
   resetPostErrorMessage,
 } from '../../../stores/slices/post/postSlice';
 
@@ -36,10 +34,6 @@ import {
   ErrorMessage,
   BottomActions,
   CancelButton,
-  SwitchWrapper,
-  SwitchSelectText,
-  SwitchSelect,
-  SwitchLabel,
 } from '../../atoms/Form/FormElements';
 import SubmitButton from '../../atoms/Buttons/SubmitButton';
 import ErrorAlert from '../../atoms/Alert/ErrorAlert';
@@ -115,7 +109,7 @@ const NewPost: VFC = () => {
           }) => (
             <>
               {postErrorMessages.map((message) => (
-                <ErrorAlert text={message} />
+                <ErrorAlert text={message} key={message} />
               ))}
               <form
                 onSubmit={(e) => {

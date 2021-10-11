@@ -1,11 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-import { ValidationError } from 'yup';
 import {
   PROPS_AUTH,
   RESPONSE_AUTH,
   PROPS_REGISTER,
-  RESPONSE_REGISTER,
   PROPS_USER_ACTIVATE,
   PROPS_RESET_PASSWORD,
   PROPS_RESET_PASSWORD_CONFIRM,
@@ -15,16 +13,6 @@ import {
 } from './types';
 import { RootState } from '../../app/store';
 import apiURL from '../share';
-import { RESPONSE_POST_FAVORITE } from '../folder/types';
-
-interface ValidationErrors {
-  errorMessage: string;
-  field_errors: Record<string, string>;
-}
-
-interface IErrorResponse {
-  detail: string;
-}
 
 export const fetchAsyncLogin = createAsyncThunk(
   'auth/login',

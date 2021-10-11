@@ -1,9 +1,9 @@
 import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useHistory, Link } from 'react-router-dom';
-import { TextField, Button, CircularProgress } from '@material-ui/core';
+
 import { AppDispatch } from '../../../../stores/app/store';
 
 import {
@@ -66,7 +66,7 @@ const ResetPasswordPage: VFC = () => {
       }) => (
         <AuthFormWrapper>
           {authErrorMessages.map((message) => (
-            <ErrorAlert text={message} />
+            <ErrorAlert text={message} key={message} />
           ))}
           <form onSubmit={handleSubmit}>
             <div>

@@ -1,20 +1,16 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
-import { RESPONSE_CREATE_FOLDER_FAILURE } from '../folder/types';
 import apiURL from '../share';
 
 import {
   PROPS_GET_POSTS,
   PROPS_CREATE_POST,
   PROPS_UPDATE_POST,
-  PROPS_POST_ID,
   POST,
   POSTS,
   RESPONSE_CREATE_POST_FAILURE,
   POST_STATE,
-  PROPS_QUERY_PARAMS_GET_POSTS,
-  FAVORITE_MESSAGE,
 } from './types';
 
 export const fetchAsyncGetPosts = createAsyncThunk(
@@ -188,16 +184,12 @@ export const fetchAsyncDeleteSelectPost = createAsyncThunk(
       id: id_list,
     };
     if (typeof localStorage.ajt === 'string') {
-      const res = await axios.post<string>(
-        `${apiURL}api/v1/postdelete/`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `JWT ${localStorage.ajt}`,
-          },
-        }
-      );
+      await axios.post<string>(`${apiURL}api/v1/postdelete/`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${localStorage.ajt}`,
+        },
+      });
       return id_list;
     }
     return rejectWithValue({ errorMessage: 'ログインしていません' });

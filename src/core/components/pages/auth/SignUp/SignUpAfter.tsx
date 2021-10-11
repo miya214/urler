@@ -1,11 +1,11 @@
 import { VFC, useEffect } from 'react';
-import { useHistory, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { selectIsAfterRegister } from '../../../../stores/slices/auth/authSlice';
+
 import {
   AuthFormWrapper,
-  AuthFormHeading,
   AuthFormBottomLink,
   AuthFormBottomLinkWrapper,
   AuthFormText,

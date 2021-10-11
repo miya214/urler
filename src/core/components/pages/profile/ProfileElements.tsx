@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 import { TableContainer, Table, TableCell } from '@mui/material';
 
 export const ProfileItemWrapper = styled.div`

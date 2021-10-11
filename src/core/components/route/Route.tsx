@@ -1,12 +1,11 @@
 import { VFC } from 'react';
-import { BrowserRouter as Router, Switch, HashRouter } from 'react-router-dom';
+import { Switch, HashRouter } from 'react-router-dom';
 
 import '../../App.css';
 
 import Navbar from '../blocks/bar/navbar/Navbar';
 import Sidebar from '../blocks/bar/sidebar/Sidebar';
 import InfoAlert from '../atoms/Alert/InfoAlert';
-import MessageWrapper from '../blocks/message/MessageWrapper';
 import LoginPage from '../pages/auth/Login';
 import SignUpPage from '../pages/auth/SignUp/SignUp';
 import SignUpAfterPage from '../pages/auth/SignUp/SignUpAfter';
@@ -14,8 +13,6 @@ import UserActivePage from '../pages/auth/SignUp/UserActive';
 import ResetPasswordPage from '../pages/auth/ResetPassword/ResetPassword';
 import ResetPasswordAfterPage from '../pages/auth/ResetPassword/ResetPasswordAfter';
 import ResetPasswordCofirmPage from '../pages/auth/ResetPassword/ResetPasswordConfirm';
-// import TopPage from '../pages/top/Top';
-// 追加
 import Profile from '../pages/profile/Profile';
 import MyFoldersPage from '../pages/folder/MyFolders';
 import FolderDetail from '../pages/folder/FolderDetail';

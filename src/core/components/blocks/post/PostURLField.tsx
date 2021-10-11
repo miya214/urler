@@ -1,9 +1,6 @@
 import { VFC } from 'react';
-import { Link } from 'react-router-dom';
-import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
+
+import { Paper, InputBase, Divider, IconButton } from '@mui/material';
 import DirectionsIcon from '@mui/icons-material/Directions';
 
 const PostURLField: VFC<{ url: string }> = ({ url }) => (

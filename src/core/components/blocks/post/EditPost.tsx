@@ -1,22 +1,15 @@
-import { VFC, useState, useEffect } from 'react';
-import Modal from 'react-modal';
-import { useLocation, useHistory } from 'react-router-dom';
+import { VFC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import {
-  Button,
-  TextField,
-  IconButton,
-  CircularProgress,
-  Switch,
-} from '@material-ui/core';
+
 import { AppDispatch } from '../../../stores/app/store';
 
 import {
   resetIsAuth,
   setAuthErrorMessage,
 } from '../../../stores/slices/auth/authSlice';
+
 import {
   setInfoMessage,
   setIsExistInfoMessage,
@@ -30,8 +23,6 @@ import {
   selectIsLoadingPost,
   selectOpenEditPost,
   selectPostErrorMessages,
-  resetOpenNewPost,
-  setPostErrorMessage,
   resetPostErrorMessage,
 } from '../../../stores/slices/post/postSlice';
 
@@ -41,11 +32,8 @@ import {
   ErrorMessage,
   BottomActions,
   CancelButton,
-  SwitchWrapper,
-  SwitchSelectText,
-  SwitchSelect,
-  SwitchLabel,
 } from '../../atoms/Form/FormElements';
+
 import SubmitButton from '../../atoms/Buttons/SubmitButton';
 import ErrorAlert from '../../atoms/Alert/ErrorAlert';
 
@@ -125,7 +113,7 @@ const EditPost: VFC<{
           }) => (
             <>
               {postErrorMessages.map((message) => (
-                <ErrorAlert text={message} />
+                <ErrorAlert text={message} key={message} />
               ))}
               <form
                 onSubmit={(e) => {

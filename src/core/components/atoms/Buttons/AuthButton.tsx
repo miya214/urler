@@ -1,6 +1,6 @@
 import { VFC, MouseEvent } from 'react';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
+
+import { Button } from '@mui/material';
 
 const AuthButton: VFC<{
   clickFunc: (e: MouseEvent<HTMLElement>) => void;
